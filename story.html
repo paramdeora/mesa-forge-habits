@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Story — Lantern Scented Candles</title>
+  <meta name="description" content="Lantern began with a single question: why does home fragrance always feel like an afterthought? We set out to change that. Read our story.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Inter:wght@300;400;500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ── Story page styles ── */
+    .story-hero {
+      position: relative;
+      height: calc(85svh - var(--nav-h));
+      min-height: 560px;
+      max-height: 800px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .story-hero-media {
+      position: absolute;
+      inset: 0;
+    }
+    .story-hero-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 30%;
+    }
+    .story-hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(21,20,18,0.52);
+    }
+    .story-hero-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding-inline: var(--gutter);
+      max-width: 760px;
+      animation: heroText 1.2s 0.3s var(--ease-out) both;
+    }
+    .story-hero-eyebrow {
+      font-family: var(--f-sans);
+      font-size: var(--t-xs);
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: rgba(246,241,230,0.6);
+      margin-bottom: var(--sp-5);
+      display: block;
+    }
+    .story-hero-title {
+      font-family: var(--f-serif);
+      font-size: clamp(2.75rem, 6vw, 5.5rem);
+      font-weight: 400;
+      color: var(--c-ivory);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+    .story-hero-title em { font-style: italic; }
+
+    /* Pull quote */
+    .story-pull {
+      background: var(--c-cream);
+      padding: clamp(4rem, 7vw, 7rem) var(--gutter);
+      text-align: center;
+      border-bottom: 1px solid var(--c-border);
+    }
+    .story-pull-inner { max-width: 780px; margin-inline: auto; }
+    .story-pull-quote {
+      font-family: var(--f-serif);
+      font-size: clamp(1.5rem, 3vw, 2.5rem);
+      font-weight: 400;
+      font-style: italic;
+      color: var(--c-ink);
+      line-height: 1.4;
+      letter-spacing: -0.01em;
+    }
+    .story-pull-attr {
+      font-family: var(--f-sans);
+      font-size: var(--t-xs);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--c-charcoal);
+      margin-top: var(--sp-6);
+    }
+
+    /* Chapter layout */
+    .story-chapter {
+      padding-block: clamp(4rem, 7vw, 7rem);
+      border-bottom: 1px solid var(--c-border-light);
+    }
+    .story-chapter-inner {
+      max-width: var(--max-w);
+      margin-inline: auto;
+      padding-inline: var(--gutter);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(3rem, 6vw, 8rem);
+      align-items: center;
+    }
+    .story-chapter-inner--reversed { direction: rtl; }
+    .story-chapter-inner--reversed > * { direction: ltr; }
+
+    .story-chapter-media {
+      position: relative;
+      overflow: hidden;
+    }
+    .story-chapter-img {
+      width: 100%;
+      aspect-ratio: 4/5;
+      object-fit: cover;
+      transition: transform var(--dur-xslow) var(--ease-out);
+      display: block;
+    }
+    .story-chapter-media:hover .story-chapter-img { transform: scale(1.03); }
+
+    .story-chapter-num {
+      font-family: var(--f-serif);
+      font-size: clamp(4rem, 8vw, 8rem);
+      font-weight: 300;
+      color: var(--c-border);
+      line-height: 1;
+      margin-bottom: var(--sp-4);
+      display: block;
+      letter-spacing: -0.04em;
+    }
+    .story-chapter-title {
+      font-family: var(--f-serif);
+      font-size: clamp(1.75rem, 3vw, 2.75rem);
+      font-weight: 400;
+      color: var(--c-ink);
+      line-height: 1.15;
+      margin-bottom: var(--sp-6);
+      letter-spacing: -0.01em;
+    }
+    .story-chapter-title em { font-style: italic; color: var(--c-cognac); }
+    .story-chapter-body {
+      font-size: var(--t-base);
+      color: var(--c-charcoal);
+      line-height: 1.85;
+      margin-bottom: var(--sp-5);
+    }
+
+    /* Values */
+    .story-values {
+      background: var(--c-ink);
+      padding: clamp(4rem, 7vw, 7rem) var(--gutter);
+    }
+    .story-values-inner {
+      max-width: var(--max-w);
+      margin-inline: auto;
+    }
+    .story-values-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-8);
+      margin-bottom: clamp(3rem, 5vw, 5rem);
+      align-items: end;
+    }
+    .story-values-title {
+      font-family: var(--f-serif);
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      font-weight: 400;
+      color: var(--c-ivory);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+    .story-values-sub {
+      font-size: var(--t-sm);
+      color: rgba(246,241,230,0.55);
+      line-height: 1.7;
+    }
+    .story-values-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: rgba(246,241,230,0.1);
+      border: 1px solid rgba(246,241,230,0.1);
+    }
+    .story-value-card {
+      background: var(--c-ink);
+      padding: clamp(1.5rem, 3vw, 2.5rem);
+      transition: background var(--dur-base);
+    }
+    .story-value-card:hover { background: #1e1c19; }
+    .story-value-icon {
+      font-family: var(--f-serif);
+      font-size: 2rem;
+      color: var(--c-cognac);
+      display: block;
+      margin-bottom: var(--sp-5);
+    }
+    .story-value-title {
+      font-family: var(--f-serif);
+      font-size: var(--t-xl);
+      color: var(--c-ivory);
+      margin-bottom: var(--sp-3);
+    }
+    .story-value-body {
+      font-size: var(--t-sm);
+      color: rgba(246,241,230,0.5);
+      line-height: 1.7;
+    }
+
+    /* Founder */
+    .story-founder {
+      background: var(--c-white);
+      padding: clamp(4rem, 7vw, 7rem) var(--gutter);
+    }
+    .story-founder-inner {
+      max-width: 860px;
+      margin-inline: auto;
+      text-align: center;
+    }
+    .story-founder-title {
+      font-family: var(--f-serif);
+      font-size: clamp(1.75rem, 3vw, 2.5rem);
+      font-weight: 400;
+      color: var(--c-ink);
+      margin-bottom: var(--sp-8);
+      line-height: 1.2;
+    }
+    .story-founder-body {
+      font-size: var(--t-base);
+      color: var(--c-charcoal);
+      line-height: 1.9;
+      margin-bottom: var(--sp-5);
+      text-align: left;
+    }
+    .story-founder-sig {
+      font-family: var(--f-serif);
+      font-size: var(--t-xl);
+      font-style: italic;
+      color: var(--c-ink);
+      margin-top: var(--sp-8);
+      display: block;
+    }
+    .story-founder-name {
+      font-size: var(--t-xs);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--c-charcoal);
+      margin-top: var(--sp-2);
+      display: block;
+    }
+
+    /* Process timeline */
+    .story-process {
+      background: var(--c-cream);
+      padding: clamp(4rem, 7vw, 7rem) var(--gutter);
+      border-top: 1px solid var(--c-border);
+    }
+    .story-process-inner { max-width: var(--max-w); margin-inline: auto; }
+    .story-process-header { margin-bottom: clamp(2.5rem, 4vw, 4rem); }
+    .story-steps {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0;
+      position: relative;
+    }
+    .story-steps::before {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: 10%;
+      right: 10%;
+      height: 1px;
+      background: var(--c-border);
+    }
+    .story-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 0 var(--sp-4);
+      position: relative;
+    }
+    .story-step-dot {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px solid var(--c-border);
+      background: var(--c-cream);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--f-serif);
+      font-size: var(--t-sm);
+      color: var(--c-ink);
+      margin-bottom: var(--sp-5);
+      position: relative;
+      z-index: 1;
+      transition: background var(--dur-base), border-color var(--dur-base);
+    }
+    .story-step:hover .story-step-dot { background: var(--c-cognac); border-color: var(--c-cognac); color: var(--c-white); }
+    .story-step-title {
+      font-family: var(--f-serif);
+      font-size: var(--t-lg);
+      color: var(--c-ink);
+      margin-bottom: var(--sp-3);
+    }
+    .story-step-body { font-size: var(--t-xs); color: var(--c-charcoal); line-height: 1.7; }
+
+    /* CTA */
+    .story-cta {
+      padding: clamp(4rem, 7vw, 7rem) var(--gutter);
+      text-align: center;
+      border-top: 1px solid var(--c-border);
+    }
+    .story-cta-inner { max-width: 640px; margin-inline: auto; }
+    .story-cta-title {
+      font-family: var(--f-serif);
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      font-weight: 400;
+      color: var(--c-ink);
+      letter-spacing: -0.02em;
+      margin-bottom: var(--sp-5);
+      line-height: 1.15;
+    }
+    .story-cta-sub { font-size: var(--t-sm); color: var(--c-charcoal); line-height: 1.7; margin-bottom: var(--sp-8); }
+    .story-cta-actions { display: flex; gap: var(--sp-4); justify-content: center; flex-wrap: wrap; }
+
+    @media (max-width: 860px) {
+      .story-chapter-inner { grid-template-columns: 1fr; gap: var(--sp-8); }
+      .story-chapter-inner--reversed { direction: ltr; }
+      .story-values-header { grid-template-columns: 1fr; }
+      .story-values-grid { grid-template-columns: 1fr 1fr; }
+      .story-steps { grid-template-columns: 1fr; gap: var(--sp-6); }
+      .story-steps::before { display: none; }
+    }
+    @media (max-width: 600px) {
+      .story-values-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ANNOUNCEMENT BAR -->
+  <div class="announcement-bar" id="announcementBar">
+    <div class="announcement-inner">
+      <span>Complimentary shipping on orders above ₹1,500</span>
+      <span class="ann-sep">·</span>
+      <span>New Collection: <em>Monsoon Noir</em> — Now Available</span>
+    </div>
+    <button class="ann-close" id="annClose" aria-label="Close announcement">×</button>
+  </div>
+
+  <!-- NAVIGATION -->
+  <header class="site-header" id="siteHeader">
+    <nav class="nav-container" role="navigation" aria-label="Main navigation">
+      <button class="nav-hamburger" id="navHamburger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+      <ul class="nav-links nav-links--left">
+        <li><a href="collections.html" class="nav-link">Shop</a></li>
+        <li class="nav-item--dropdown">
+          <a href="collections.html" class="nav-link">Collections <span class="nav-chevron">›</span></a>
+          <div class="nav-dropdown"><div class="nav-dropdown-inner">
+            <div class="nav-dropdown-col"><p class="nav-dropdown-label">By Mood</p><a href="collections.html#morning" class="nav-dropdown-link">Morning Calm</a><a href="collections.html#evening" class="nav-dropdown-link">Evening Ritual</a><a href="collections.html#monsoon" class="nav-dropdown-link">Monsoon Noir</a></div>
+            <div class="nav-dropdown-col"><p class="nav-dropdown-label">By Note</p><a href="#" class="nav-dropdown-link">Woody & Resinous</a><a href="#" class="nav-dropdown-link">Floral & Green</a></div>
+            <div class="nav-dropdown-col nav-dropdown-col--feature"><p class="nav-dropdown-label">New</p><a href="collections.html#monsoon" class="nav-dropdown-link nav-dropdown-link--featured">Monsoon Noir Collection</a><p class="nav-dropdown-sub">Dark vetiver, petrichor, rain-soaked earth.</p></div>
+          </div></div>
+        </li>
+        <li><a href="story.html" class="nav-link" style="color:var(--c-ink)">Our Story</a></li>
+      </ul>
+      <a href="index.html" class="site-logo"><span class="logo-wordmark">Lantern</span><span class="logo-sub">Scented Candles</span></a>
+      <ul class="nav-links nav-links--right">
+        <li><a href="journal.html" class="nav-link">Journal</a></li>
+        <li><a href="gifting.html" class="nav-link">Gifting</a></li>
+      </ul>
+      <div class="nav-utils">
+        <button class="nav-icon-btn" id="searchToggle" aria-label="Search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+        <button class="nav-icon-btn" id="cartToggle" aria-label="Cart"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><span class="cart-count" id="cartCount">0</span></button>
+      </div>
+    </nav>
+    <div class="search-overlay" id="searchOverlay" aria-hidden="true">
+      <div class="search-overlay-inner"><input type="search" class="search-input" id="searchInput" placeholder="Search…" autocomplete="off"><button class="search-close" id="searchClose" aria-label="Close">×</button></div>
+    </div>
+  </header>
+
+  <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+    <div class="mobile-menu-header"><a href="index.html" class="mobile-logo">Lantern</a><button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close">×</button></div>
+    <nav class="mobile-nav">
+      <a href="collections.html" class="mobile-nav-link">Shop</a>
+      <a href="collections.html" class="mobile-nav-link">Collections</a>
+      <a href="story.html" class="mobile-nav-link">Our Story</a>
+      <a href="journal.html" class="mobile-nav-link">Journal</a>
+      <a href="gifting.html" class="mobile-nav-link">Gifting</a>
+    </nav>
+    <div class="mobile-menu-footer"><a href="#" class="mobile-footer-link">Search</a></div>
+  </div>
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+
+  <main id="main-content">
+
+    <!-- Hero -->
+    <section class="story-hero" aria-label="Our story hero">
+      <div class="story-hero-media">
+        <img src="editorial_interior_1788713535450.png" alt="Lantern candle in a contemporary interior" class="story-hero-img" fetchpriority="high">
+        <div class="story-hero-overlay"></div>
+      </div>
+      <div class="story-hero-content">
+        <span class="story-hero-eyebrow">Our Story</span>
+        <h1 class="story-hero-title">Made for the<br>quality of a room's <em>light.</em></h1>
+      </div>
+    </section>
+
+    <!-- Pull quote -->
+    <div class="story-pull">
+      <div class="story-pull-inner">
+        <p class="story-pull-quote reveal-up">"We didn't set out to make candles. We set out to make the kind of atmosphere that makes a room feel like it belongs to you."</p>
+        <p class="story-pull-attr reveal-up">— Arya Menon, Founder</p>
+      </div>
+    </div>
+
+    <!-- Chapter 1: The Beginning -->
+    <section class="story-chapter">
+      <div class="story-chapter-inner">
+        <div class="story-chapter-media reveal-up">
+          <img src="product_lifestyle_1788712311819.png" alt="Early Lantern candles on a stone surface" class="story-chapter-img" loading="lazy">
+        </div>
+        <div class="story-chapter-text">
+          <span class="story-chapter-num reveal-up">01</span>
+          <h2 class="story-chapter-title reveal-up">It began with a<br><em>problem of atmosphere.</em></h2>
+          <p class="story-chapter-body reveal-up">Lantern started in 2021, in a small apartment in Bengaluru where the fragrance options were either too sweet, too synthetic, or too ordinary. We had lived with premium fragrance — fine perfume, incense from temple towns — and we couldn't understand why home scent always felt like an afterthought.</p>
+          <p class="story-chapter-body reveal-up">We began experimenting. Wax blends, wick types, fragrance oil ratios, pouring temperatures. We tested 400 combinations before we found one we were proud of. That first formula became Dusk Vetiver.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chapter 2: The Craft -->
+    <section class="story-chapter" style="background:var(--c-white)">
+      <div class="story-chapter-inner story-chapter-inner--reversed">
+        <div class="story-chapter-media reveal-up">
+          <img src="product_card_2_1788712370744.png" alt="Lantern candle craft and materials" class="story-chapter-img" loading="lazy">
+        </div>
+        <div class="story-chapter-text">
+          <span class="story-chapter-num reveal-up">02</span>
+          <h2 class="story-chapter-title reveal-up">Fragrance as a<br><em>serious discipline.</em></h2>
+          <p class="story-chapter-body reveal-up">We source fragrance oils from perfumery-grade suppliers — the same houses that supply to Maison Margiela and Jo Malone. We do not use fragrance compounds designed for mass-market candles. The price difference is significant. We absorb it.</p>
+          <p class="story-chapter-body reveal-up">Our wax is a proprietary blend of coconut and soy — cleaner burning than paraffin, with a lower melting point that allows fragrance to release gradually rather than in a single overwhelming burst.</p>
+          <p class="story-chapter-body reveal-up">Every candle is poured at a precise temperature, by hand, in our studio. Batch size is limited by what we can physically pour in a day.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chapter 3: The India Vision -->
+    <section class="story-chapter">
+      <div class="story-chapter-inner">
+        <div class="story-chapter-media reveal-up">
+          <img src="product_card_1_1788712341526.png" alt="India-inspired fragrance" class="story-chapter-img" loading="lazy">
+        </div>
+        <div class="story-chapter-text">
+          <span class="story-chapter-num reveal-up">03</span>
+          <h2 class="story-chapter-title reveal-up">An <em>Indian luxury</em><br>that doesn't apologise for itself.</h2>
+          <p class="story-chapter-body reveal-up">Luxury home fragrance in India has long looked to Paris for permission. We don't. Our references are the scent of rain on red earth in Kerala. Cardamom from a Coorg morning. Old sandalwood from a Mysuru market. Incense drifting through a Benaras corridor.</p>
+          <p class="story-chapter-body reveal-up">These are world-class references. We treat them as such. Lantern is a luxury brand that happens to be Indian — not an Indian brand trying to feel luxurious.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Values -->
+    <section class="story-values">
+      <div class="story-values-inner">
+        <div class="story-values-header">
+          <h2 class="story-values-title reveal-up">What we<br>stand for.</h2>
+          <p class="story-values-sub reveal-up">Four principles that govern every decision we make — from the ingredients we source to the way we ship.</p>
+        </div>
+        <div class="story-values-grid">
+          <div class="story-value-card reveal-up">
+            <span class="story-value-icon">◈</span>
+            <h3 class="story-value-title">No shortcuts</h3>
+            <p class="story-value-body">Premium ingredients, small batches, hands that pour. We will never optimise the craft out of the candle to reduce cost.</p>
+          </div>
+          <div class="story-value-card reveal-up" style="--reveal-delay:0.08s">
+            <span class="story-value-icon">◉</span>
+            <h3 class="story-value-title">Clean burning</h3>
+            <p class="story-value-body">Natural wax, cotton wicks, no paraffin, no synthetic dyes. What goes into the air in your home should be something you'd choose.</p>
+          </div>
+          <div class="story-value-card reveal-up" style="--reveal-delay:0.16s">
+            <span class="story-value-icon">◎</span>
+            <h3 class="story-value-title">Honest pricing</h3>
+            <p class="story-value-body">We price for quality, not for brand inflation. You pay for what's inside the vessel. No margin hidden in the logo.</p>
+          </div>
+          <div class="story-value-card reveal-up" style="--reveal-delay:0.24s">
+            <span class="story-value-icon">◇</span>
+            <h3 class="story-value-title">Considered design</h3>
+            <p class="story-value-body">Packaging that earns its place on a shelf. Nothing excessive, nothing disposable. The vessel outlives the candle.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Process -->
+    <section class="story-process">
+      <div class="story-process-inner">
+        <div class="story-process-header">
+          <p class="section-label reveal-up">How we make it</p>
+          <h2 class="section-title reveal-up">From raw material<br>to finished candle.</h2>
+        </div>
+        <div class="story-steps">
+          <div class="story-step reveal-up">
+            <div class="story-step-dot">1</div>
+            <h3 class="story-step-title">Sourcing</h3>
+            <p class="story-step-body">Fragrance oils sourced from perfumery-grade suppliers. Wax imported from certified natural farms.</p>
+          </div>
+          <div class="story-step reveal-up" style="--reveal-delay:0.08s">
+            <div class="story-step-dot">2</div>
+            <h3 class="story-step-title">Blending</h3>
+            <p class="story-step-body">Each fragrance is blended in-house and allowed to rest for 48 hours before pouring begins.</p>
+          </div>
+          <div class="story-step reveal-up" style="--reveal-delay:0.16s">
+            <div class="story-step-dot">3</div>
+            <h3 class="story-step-title">Pouring</h3>
+            <p class="story-step-body">Wax is heated to a precise temperature and poured by hand into cured, pre-wicked vessels.</p>
+          </div>
+          <div class="story-step reveal-up" style="--reveal-delay:0.24s">
+            <div class="story-step-dot">4</div>
+            <h3 class="story-step-title">Curing</h3>
+            <p class="story-step-body">Candles cure for a minimum of 72 hours before inspection. This ensures an even melt pool and full scent throw.</p>
+          </div>
+          <div class="story-step reveal-up" style="--reveal-delay:0.32s">
+            <div class="story-step-dot">5</div>
+            <h3 class="story-step-title">Dispatch</h3>
+            <p class="story-step-body">Each candle is inspected, labelled, and packed in tissue before shipping — directly from our studio.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Founder note -->
+    <section class="story-founder">
+      <div class="story-founder-inner">
+        <h2 class="story-founder-title reveal-up">A note from the founder</h2>
+        <p class="story-founder-body reveal-up">I started Lantern because I couldn't find a candle I actually wanted to keep in my home. Everything was too sweet, too perfumed, too obviously trying to communicate luxury through packaging rather than substance.</p>
+        <p class="story-founder-body reveal-up">I spent two years learning about fragrance before I felt confident enough to sell anything. I studied how fine perfume houses think about scent construction — top, heart, base, dry-down, diffusion. I applied that thinking to candles. The results were different enough from anything else in the market that I felt we had something worth sharing.</p>
+        <p class="story-founder-body reveal-up">Lantern is still small. Every candle is still poured in our studio. I like it this way. There is something about scale that changes the quality of attention. We will grow carefully.</p>
+        <span class="story-founder-sig reveal-up">Arya</span>
+        <span class="story-founder-name reveal-up">Arya Menon · Founder & Creative Director</span>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="story-cta">
+      <div class="story-cta-inner">
+        <p class="section-label reveal-up" style="text-align:center">Begin here</p>
+        <h2 class="story-cta-title reveal-up">The candle that started it all.</h2>
+        <p class="story-cta-sub reveal-up">Dusk Vetiver remains our most distinctive fragrance. If you're new to Lantern, it's where we suggest you start.</p>
+        <div class="story-cta-actions reveal-up">
+          <a href="product.html" class="btn btn--primary">Shop Dusk Vetiver</a>
+          <a href="collections.html" class="btn btn--outline">View All Candles</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="index.html" class="footer-logo"><span class="footer-logo-wordmark">Lantern</span><span class="footer-logo-sub">Scented Candles</span></a>
+        <p class="footer-tagline">Crafted for atmosphere.<br>Poured by hand. Made in India.</p>
+        <div class="footer-social"><a href="#" class="footer-social-link" aria-label="Instagram"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a></div>
+      </div>
+      <div class="footer-nav">
+        <div class="footer-nav-col"><h4 class="footer-nav-title">Shop</h4><ul class="footer-nav-list"><li><a href="collections.html" class="footer-nav-link">All Candles</a></li><li><a href="gifting.html" class="footer-nav-link">Gift Sets</a></li></ul></div>
+        <div class="footer-nav-col"><h4 class="footer-nav-title">Company</h4><ul class="footer-nav-list"><li><a href="story.html" class="footer-nav-link">Our Story</a></li><li><a href="journal.html" class="footer-nav-link">Journal</a></li></ul></div>
+        <div class="footer-nav-col"><h4 class="footer-nav-title">Help</h4><ul class="footer-nav-list"><li><a href="#" class="footer-nav-link">Shipping & Returns</a></li><li><a href="#" class="footer-nav-link">Contact Us</a></li></ul></div>
+      </div>
+    </div>
+    <div class="footer-bottom"><p class="footer-legal">© 2026 Lantern Scented Candles. All rights reserved.</p></div>
+  </footer>
+
+  <div class="cart-drawer" id="cartDrawer" aria-hidden="true" role="dialog" aria-label="Shopping cart">
+    <div class="cart-drawer-header"><h2 class="cart-drawer-title">Your Cart</h2><button class="cart-drawer-close" id="cartClose" aria-label="Close cart">×</button></div>
+    <div class="cart-drawer-body" id="cartBody"><div class="cart-empty" id="cartEmpty"><p class="cart-empty-text">Your cart is empty.</p><a href="collections.html" class="btn btn--outline btn--sm">Explore Candles</a></div><ul class="cart-items" id="cartItems"></ul></div>
+    <div class="cart-drawer-footer" id="cartFooter" hidden><div class="cart-subtotal"><span>Subtotal</span><span id="cartSubtotal">₹0</span></div><p class="cart-shipping-note">Complimentary shipping on orders above ₹1,500</p><button class="btn btn--primary btn--full">Proceed to Checkout</button></div>
+  </div>
+  <div class="cart-overlay" id="cartOverlay"></div>
+
+  <script src="main.js"></script>
+</body>
+</html>

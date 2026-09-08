@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gifting — Lantern Scented Candles</title>
+  <meta name="description" content="Lantern gift sets. Handcrafted matte boxes, personal note cards, free gift wrapping. The considered gift for people with taste.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Inter:wght@300;400;500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ── Gifting page styles ── */
+
+    /* Hero — full dark */
+    .gift-hero {
+      background: var(--c-ink);
+      min-height: calc(65svh - var(--nav-h));
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .gift-hero-bg {
+      position: absolute;
+      inset: 0;
+      opacity: 0.18;
+    }
+    .gift-hero-bg-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 40%;
+    }
+    .gift-hero-inner {
+      position: relative;
+      z-index: 2;
+      max-width: var(--max-w);
+      margin-inline: auto;
+      padding: clamp(4rem, 7vw, 7rem) var(--gutter);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(3rem, 6vw, 8rem);
+      align-items: center;
+      width: 100%;
+    }
+    .gift-hero-text {}
+    .gift-hero-title {
+      font-family: var(--f-serif);
+      font-size: clamp(2.5rem, 5vw, 5rem);
+      font-weight: 400;
+      color: var(--c-ivory);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      margin-bottom: var(--sp-5);
+    }
+    .gift-hero-title em { font-style: italic; }
+    .gift-hero-body {
+      font-size: var(--t-base);
+      color: rgba(246,241,230,0.6);
+      line-height: 1.75;
+      margin-bottom: var(--sp-8);
+    }
+    .gift-hero-guarantees {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-4);
+    }
+    .gift-guarantee {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-4);
+      font-size: var(--t-sm);
+      color: rgba(246,241,230,0.7);
+    }
+    .gift-guarantee-icon {
+      width: 32px;
+      height: 32px;
+      border: 1px solid rgba(246,241,230,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--c-cognac);
+    }
+    .gift-hero-visual {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-3);
+    }
+    .gift-hero-img-main {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      opacity: 0.85;
+      transition: opacity var(--dur-base);
+    }
+    .gift-hero-img-main:hover { opacity: 1; }
+    .gift-hero-imgs-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-3);
+    }
+    .gift-hero-img-sm {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      opacity: 0.7;
+      transition: opacity var(--dur-base);
+    }
+    .gift-hero-img-sm:hover { opacity: 0.95; }
+
+    /* Why Lantern gift */
+    .gift-why {
+      background: var(--c-cream);
+      padding: clamp(4rem, 7vw, 7rem) var(--gutter);
+      border-bottom: 1px solid var(--c-border);
+      text-align: center;
+    }
+    .gift-why-inner { max-width: 680px; margin-inline: auto; }
+    .gift-why-title {
+      font-family: var(--f-serif);
+      font-size: clamp(1.75rem, 3vw, 2.75rem);
+      font-weight: 400;
+      color: var(--c-ink);
+      line-height: 1.2;
+      margin-bottom: var(--sp-5);
+      letter-spacing: -0.01em;
+    }
+    .gift-why-body {
+      font-size: var(--t-base);
+      color: var(--c-charcoal);
+      line-height: 1.8;
+    }
+
+    /* Gift sets grid */
+    .gift-sets-section {
+      padding: clamp(4rem, 7vw, 7rem) var(--gutter);
+    }
+    .gift-sets-inner { max-width: var(--max-w); margin-inline: auto; }
+    .gift-sets-header { margin-bottom: clamp(2.5rem, 4vw, 4rem); }
+
+    .gift-sets-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: clamp(1.5rem, 2.5vw, 2.5rem);
+    }
+
+    .gift-set-card {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--c-border-light);
+      transition: border-color var(--dur-base), transform var(--dur-base) var(--ease-out), box-shadow var(--dur-base);
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .gift-set-card:hover {
+      border-color: var(--c-border);
+      transform: translateY(-6px);
+      box-shadow: 0 20px 48px rgba(21,20,18,0.08);
+    }
+    .gift-set-card--featured {
+      grid-column: span 2;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+    }
+    .gift-set-card--featured .gift-set-media { aspect-ratio: auto; min-height: 360px; }
+
+    .gift-set-media {
+      aspect-ratio: 4/3;
+      overflow: hidden;
+      position: relative;
+    }
+    .gift-set-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform var(--dur-xslow) var(--ease-out);
+    }
+    .gift-set-card:hover .gift-set-img { transform: scale(1.05); }
+
+    .gift-set-tag {
+      position: absolute;
+      top: var(--sp-4);
+      left: var(--sp-4);
+      background: var(--c-ink);
+      color: var(--c-ivory);
+      font-size: var(--t-xs);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: var(--sp-1) var(--sp-3);
+    }
+    .gift-set-tag--popular { background: var(--c-cognac); }
+
+    .gift-set-content {
+      padding: clamp(1.25rem, 2.5vw, 2rem);
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .gift-set-name {
+      font-family: var(--f-serif);
+      font-size: var(--t-xl);
+      font-weight: 400;
+      color: var(--c-ink);
+      margin-bottom: var(--sp-2);
+      line-height: 1.25;
+    }
+    .gift-set-desc {
+      font-size: var(--t-sm);
+      color: var(--c-charcoal);
+      line-height: 1.65;
+      margin-bottom: var(--sp-5);
+      flex: 1;
+    }
+    .gift-set-includes {
+      font-size: var(--t-xs);
+      color: var(--c-charcoal);
+      letter-spacing: 0.08em;
+      margin-bottom: var(--sp-4);
+    }
+    .gift-set-includes strong { color: var(--c-ink); }
+    .gift-set-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: var(--sp-4);
+      border-top: 1px solid var(--c-border-light);
+    }
+    .gift-set-price {
+      font-family: var(--f-serif);
+      font-size: var(--t-xl);
+      color: var(--c-ink);
+    }
+    .gift-set-cta {
+      font-family: var(--f-sans);
+      font-size: var(--t-xs);
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--c-ink);
+      border-bottom: 1px solid var(--c-border);
+      padding-bottom: 2px;
+      transition: color var(--dur-fast), border-color var(--dur-fast);
+    }
+    .gift-set-card:hover .gift-set-cta { color: var(--c-cognac); border-color: var(--c-cognac); }
+
+    /* How it works */
+    .gift-how {
+      background: var(--c-white);
+      padding: clamp(4rem, 7vw, 7rem) var(--gutter);
+      border-top: 1px solid var(--c-border);
+    }
+    .gift-how-inner { max-width: var(--max-w); margin-inline: auto; }
+    .gift-how-steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: clamp(1.5rem, 3vw, 3rem);
+      margin-top: clamp(2.5rem, 4vw, 4rem);
+    }
+    .gift-how-step {}
+    .gift-how-step-num {
+      font-family: var(--f-serif);
+      font-size: clamp(3rem, 5vw, 5rem);
+      font-weight: 300;
+      color: var(--c-border);
+      line-height: 1;
+      display: block;
+      margin-bottom: var(--sp-4);
+      transition: color var(--dur-base);
+    }
+    .gift-how-step:hover .gift-how-step-num { color: var(--c-cognac); }
+    .gift-how-step-title {
+      font-family: var(--f-serif);
+      font-size: var(--t-xl);
+      color: var(--c-ink);
+      margin-bottom: var(--sp-3);
+    }
+    .gift-how-step-body { font-size: var(--t-sm); color: var(--c-charcoal); line-height: 1.7; }
+
+    /* Bespoke / Corporate */
+    .gift-bespoke {
+      background: var(--c-cream);
+      padding: clamp(4rem, 7vw, 7rem) var(--gutter);
+      border-top: 1px solid var(--c-border);
+    }
+    .gift-bespoke-inner {
+      max-width: var(--max-w);
+      margin-inline: auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(3rem, 5vw, 6rem);
+      align-items: center;
+    }
+    .gift-bespoke-title {
+      font-family: var(--f-serif);
+      font-size: clamp(1.75rem, 3vw, 3rem);
+      font-weight: 400;
+      color: var(--c-ink);
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      margin-bottom: var(--sp-5);
+    }
+    .gift-bespoke-title em { font-style: italic; color: var(--c-cognac); }
+    .gift-bespoke-body {
+      font-size: var(--t-base);
+      color: var(--c-charcoal);
+      line-height: 1.8;
+      margin-bottom: var(--sp-5);
+    }
+    .gift-bespoke-items {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-3);
+      margin-bottom: var(--sp-8);
+    }
+    .gift-bespoke-item {
+      display: flex;
+      align-items: baseline;
+      gap: var(--sp-4);
+      font-size: var(--t-sm);
+      color: var(--c-charcoal);
+    }
+    .gift-bespoke-item::before {
+      content: '—';
+      color: var(--c-cognac);
+      flex-shrink: 0;
+    }
+    .gift-bespoke-media {
+      overflow: hidden;
+    }
+    .gift-bespoke-img {
+      width: 100%;
+      aspect-ratio: 4/5;
+      object-fit: cover;
+      transition: transform var(--dur-xslow) var(--ease-out);
+    }
+    .gift-bespoke-media:hover .gift-bespoke-img { transform: scale(1.03); }
+
+    /* Note card form */
+    .gift-note-section {
+      padding: clamp(4rem, 7vw, 7rem) var(--gutter);
+      background: var(--c-ivory);
+    }
+    .gift-note-inner {
+      max-width: 640px;
+      margin-inline: auto;
+      text-align: center;
+    }
+    .gift-note-title {
+      font-family: var(--f-serif);
+      font-size: clamp(1.75rem, 3vw, 2.5rem);
+      font-weight: 400;
+      color: var(--c-ink);
+      margin-bottom: var(--sp-4);
+      line-height: 1.2;
+    }
+    .gift-note-sub { font-size: var(--t-sm); color: var(--c-charcoal); margin-bottom: var(--sp-8); }
+    .gift-note-form { text-align: left; }
+    .gift-form-row { margin-bottom: var(--sp-5); }
+    .gift-form-label {
+      display: block;
+      font-family: var(--f-sans);
+      font-size: var(--t-xs);
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--c-charcoal);
+      margin-bottom: var(--sp-3);
+    }
+    .gift-form-input,
+    .gift-form-textarea {
+      width: 100%;
+      background: var(--c-white);
+      border: 1px solid var(--c-border);
+      font-family: var(--f-sans);
+      font-size: var(--t-sm);
+      color: var(--c-ink);
+      padding: var(--sp-4) var(--sp-5);
+      outline: none;
+      transition: border-color var(--dur-fast);
+      resize: vertical;
+    }
+    .gift-form-input:focus,
+    .gift-form-textarea:focus { border-color: var(--c-ink); }
+    .gift-form-textarea { min-height: 120px; }
+    .gift-form-note {
+      font-size: var(--t-xs);
+      color: var(--c-charcoal);
+      margin-top: var(--sp-2);
+      opacity: 0.7;
+    }
+
+    @media (max-width: 1000px) {
+      .gift-sets-grid { grid-template-columns: repeat(2, 1fr); }
+      .gift-set-card--featured { grid-column: span 2; }
+      .gift-how-steps { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 860px) {
+      .gift-hero-inner { grid-template-columns: 1fr; }
+      .gift-hero-visual { display: none; }
+      .gift-bespoke-inner { grid-template-columns: 1fr; }
+      .gift-set-card--featured { grid-column: span 2; grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .gift-sets-grid { grid-template-columns: 1fr; }
+      .gift-set-card--featured { grid-column: span 1; }
+      .gift-how-steps { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ANNOUNCEMENT BAR -->
+  <div class="announcement-bar" id="announcementBar">
+    <div class="announcement-inner">
+      <span>Complimentary shipping on orders above ₹1,500</span>
+      <span class="ann-sep">·</span>
+      <span>Free gift wrapping on all orders</span>
+      <span class="ann-sep">·</span>
+      <span>Personalised note cards included</span>
+    </div>
+    <button class="ann-close" id="annClose" aria-label="Close announcement">×</button>
+  </div>
+
+  <!-- NAVIGATION -->
+  <header class="site-header" id="siteHeader">
+    <nav class="nav-container" role="navigation" aria-label="Main navigation">
+      <button class="nav-hamburger" id="navHamburger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+      <ul class="nav-links nav-links--left">
+        <li><a href="collections.html" class="nav-link">Shop</a></li>
+        <li class="nav-item--dropdown">
+          <a href="collections.html" class="nav-link">Collections <span class="nav-chevron">›</span></a>
+          <div class="nav-dropdown"><div class="nav-dropdown-inner">
+            <div class="nav-dropdown-col"><p class="nav-dropdown-label">By Mood</p><a href="collections.html#morning" class="nav-dropdown-link">Morning Calm</a><a href="collections.html#evening" class="nav-dropdown-link">Evening Ritual</a><a href="collections.html#monsoon" class="nav-dropdown-link">Monsoon Noir</a></div>
+            <div class="nav-dropdown-col nav-dropdown-col--feature"><p class="nav-dropdown-label">New</p><a href="collections.html#monsoon" class="nav-dropdown-link nav-dropdown-link--featured">Monsoon Noir Collection</a></div>
+          </div></div>
+        </li>
+        <li><a href="story.html" class="nav-link">Our Story</a></li>
+      </ul>
+      <a href="index.html" class="site-logo"><span class="logo-wordmark">Lantern</span><span class="logo-sub">Scented Candles</span></a>
+      <ul class="nav-links nav-links--right">
+        <li><a href="journal.html" class="nav-link">Journal</a></li>
+        <li><a href="gifting.html" class="nav-link" style="color:var(--c-ink)">Gifting</a></li>
+      </ul>
+      <div class="nav-utils">
+        <button class="nav-icon-btn" id="searchToggle" aria-label="Search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+        <button class="nav-icon-btn" id="cartToggle" aria-label="Cart"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><span class="cart-count" id="cartCount">0</span></button>
+      </div>
+    </nav>
+    <div class="search-overlay" id="searchOverlay" aria-hidden="true">
+      <div class="search-overlay-inner"><input type="search" class="search-input" id="searchInput" placeholder="Search…" autocomplete="off"><button class="search-close" id="searchClose">×</button></div>
+    </div>
+  </header>
+
+  <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+    <div class="mobile-menu-header"><a href="index.html" class="mobile-logo">Lantern</a><button class="mobile-menu-close" id="mobileMenuClose">×</button></div>
+    <nav class="mobile-nav">
+      <a href="collections.html" class="mobile-nav-link">Shop</a>
+      <a href="story.html" class="mobile-nav-link">Our Story</a>
+      <a href="journal.html" class="mobile-nav-link">Journal</a>
+      <a href="gifting.html" class="mobile-nav-link">Gifting</a>
+    </nav>
+    <div class="mobile-menu-footer"><a href="#" class="mobile-footer-link">Search</a></div>
+  </div>
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+
+  <main id="main-content">
+
+    <!-- Hero -->
+    <section class="gift-hero" aria-label="Gifting hero">
+      <div class="gift-hero-bg">
+        <img src="product_lifestyle_1788712311819.png" alt="" class="gift-hero-bg-img" loading="eager" aria-hidden="true">
+      </div>
+      <div class="gift-hero-inner">
+        <div class="gift-hero-text">
+          <p class="section-label section-label--light reveal-up">Gifting</p>
+          <h1 class="gift-hero-title reveal-up">The considered gift<br>for people<br>with <em>taste.</em></h1>
+          <p class="gift-hero-body reveal-up">Every Lantern gift set arrives in a handcrafted matte box, tissue-wrapped, with a personal note card. Nothing is an afterthought.</p>
+          <div class="gift-hero-guarantees reveal-up">
+            <div class="gift-guarantee">
+              <div class="gift-guarantee-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <span>Free gift wrapping on every order</span>
+            </div>
+            <div class="gift-guarantee">
+              <div class="gift-guarantee-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <span>Personalised note card included</span>
+            </div>
+            <div class="gift-guarantee">
+              <div class="gift-guarantee-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <span>Direct delivery to the recipient</span>
+            </div>
+            <div class="gift-guarantee">
+              <div class="gift-guarantee-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <span>Bespoke corporate orders available</span>
+            </div>
+          </div>
+        </div>
+        <div class="gift-hero-visual reveal-up" style="--reveal-delay:0.15s">
+          <img src="product_card_4_1788713547615.png" alt="Lantern gift set" class="gift-hero-img-main" loading="eager">
+          <div class="gift-hero-imgs-row">
+            <img src="product_card_3_1788712385453.png" alt="Gift candle detail" class="gift-hero-img-sm" loading="eager">
+            <img src="product_card_1_1788712341526.png" alt="Gift packaging detail" class="gift-hero-img-sm" loading="eager">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Why Lantern gift -->
+    <div class="gift-why">
+      <div class="gift-why-inner">
+        <p class="section-label reveal-up" style="text-align:center">Why Lantern</p>
+        <h2 class="gift-why-title reveal-up">Some gifts are received. A Lantern gift is remembered.</h2>
+        <p class="gift-why-body reveal-up">The average gift candle burns for 30 hours and smells of vanilla. A Lantern candle burns for 55, smells of nothing ordinary, and arrives in packaging that the recipient keeps. We've designed every part of this experience for the moment of opening — not just the moment of purchase.</p>
+      </div>
+    </div>
+
+    <!-- Gift Sets -->
+    <section class="gift-sets-section">
+      <div class="gift-sets-inner">
+        <div class="gift-sets-header">
+          <p class="section-label reveal-up">Gift Sets</p>
+          <h2 class="section-title reveal-up">Curated for every occasion.</h2>
+        </div>
+        <div class="gift-sets-grid">
+
+          <!-- Featured -->
+          <a href="product.html" class="gift-set-card gift-set-card--featured reveal-up">
+            <div class="gift-set-media">
+              <img src="product_lifestyle_1788712311819.png" alt="The Signature Duo gift set" class="gift-set-img" loading="lazy">
+              <span class="gift-set-tag gift-set-tag--popular">Most Gifted</span>
+            </div>
+            <div class="gift-set-content">
+              <h3 class="gift-set-name">The Signature Duo</h3>
+              <p class="gift-set-desc">Our two bestselling fragrances together in a handcrafted matte box. Dusk Vetiver and Grey Cardamom — opposite ends of our palette, both completely essential. The perfect introduction to Lantern.</p>
+              <p class="gift-set-includes"><strong>Includes:</strong> Dusk Vetiver 300g · Grey Cardamom 300g · Matte gift box · Note card · Tissue wrap</p>
+              <div class="gift-set-footer">
+                <span class="gift-set-price">₹3,500</span>
+                <span class="gift-set-cta">Shop Now →</span>
+              </div>
+            </div>
+          </a>
+
+          <!-- 3 single sets -->
+          <a href="product.html" class="gift-set-card reveal-up" style="--reveal-delay:0.08s">
+            <div class="gift-set-media">
+              <img src="product_card_3_1788712385453.png" alt="The Morning Gift" class="gift-set-img" loading="lazy">
+              <span class="gift-set-tag">New</span>
+            </div>
+            <div class="gift-set-content">
+              <h3 class="gift-set-name">The Morning Gift</h3>
+              <p class="gift-set-desc">White Jasmine and Green Fig — fresh, light, and composed. For someone who values their mornings.</p>
+              <p class="gift-set-includes"><strong>Includes:</strong> White Jasmine 300g · Green Fig 150g · Gift box · Note card</p>
+              <div class="gift-set-footer">
+                <span class="gift-set-price">₹2,800</span>
+                <span class="gift-set-cta">Shop →</span>
+              </div>
+            </div>
+          </a>
+
+          <a href="product.html" class="gift-set-card reveal-up" style="--reveal-delay:0.16s">
+            <div class="gift-set-media">
+              <img src="editorial_interior_1788713535450.png" alt="The Monsoon Edit" class="gift-set-img" loading="lazy">
+              <span class="gift-set-tag gift-set-tag--popular">New Collection</span>
+            </div>
+            <div class="gift-set-content">
+              <h3 class="gift-set-name">The Monsoon Edit</h3>
+              <p class="gift-set-desc">All three Monsoon Noir fragrances in one set. Dark, atmospheric, and unlike anything else in Indian home fragrance.</p>
+              <p class="gift-set-includes"><strong>Includes:</strong> Amber Rain · Noir Vetiver · Rain on Stone · All 150g · Gift box</p>
+              <div class="gift-set-footer">
+                <span class="gift-set-price">₹4,200</span>
+                <span class="gift-set-cta">Shop →</span>
+              </div>
+            </div>
+          </a>
+
+          <a href="product.html" class="gift-set-card reveal-up" style="--reveal-delay:0.08s">
+            <div class="gift-set-media">
+              <img src="product_card_2_1788712370744.png" alt="The Single Candle Gift" class="gift-set-img" loading="lazy">
+            </div>
+            <div class="gift-set-content">
+              <h3 class="gift-set-name">The Single Candle Gift</h3>
+              <p class="gift-set-desc">Any one Lantern candle of your choice, gifted in our signature matte box with a personal note card. Simple and considered.</p>
+              <p class="gift-set-includes"><strong>Includes:</strong> One candle (300g) · Gift box · Note card · Tissue wrap</p>
+              <div class="gift-set-footer">
+                <span class="gift-set-price">From ₹2,100</span>
+                <span class="gift-set-cta">Choose Scent →</span>
+              </div>
+            </div>
+          </a>
+
+          <a href="product.html" class="gift-set-card reveal-up" style="--reveal-delay:0.16s">
+            <div class="gift-set-media">
+              <img src="product_card_1_1788712341526.png" alt="The Full Collection" class="gift-set-img" loading="lazy">
+              <span class="gift-set-tag">Premium</span>
+            </div>
+            <div class="gift-set-content">
+              <h3 class="gift-set-name">The Full Collection</h3>
+              <p class="gift-set-desc">Every Lantern fragrance in 150g format. For the person who deserves everything, or for someone you want to introduce to the full breadth of the range.</p>
+              <p class="gift-set-includes"><strong>Includes:</strong> All 8 fragrances · 150g each · Premium gift case · Note card</p>
+              <div class="gift-set-footer">
+                <span class="gift-set-price">₹9,800</span>
+                <span class="gift-set-cta">Shop →</span>
+              </div>
+            </div>
+          </a>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="gift-how">
+      <div class="gift-how-inner">
+        <div class="section-header">
+          <p class="section-label reveal-up">How it works</p>
+          <h2 class="section-title reveal-up">Gifting made simple.</h2>
+        </div>
+        <div class="gift-how-steps">
+          <div class="gift-how-step reveal-up">
+            <span class="gift-how-step-num">01</span>
+            <h3 class="gift-how-step-title">Choose your set</h3>
+            <p class="gift-how-step-body">Select from our curated gift sets or build your own by choosing any combination of candles from the full collection.</p>
+          </div>
+          <div class="gift-how-step reveal-up" style="--reveal-delay:0.08s">
+            <span class="gift-how-step-num">02</span>
+            <h3 class="gift-how-step-title">Write your note</h3>
+            <p class="gift-how-step-body">Add a personal message at checkout. We'll print it on a handmade paper note card and place it inside the box.</p>
+          </div>
+          <div class="gift-how-step reveal-up" style="--reveal-delay:0.16s">
+            <span class="gift-how-step-num">03</span>
+            <h3 class="gift-how-step-title">We wrap it</h3>
+            <p class="gift-how-step-body">Every gift order is wrapped in tissue, placed in our matte gift box, and sealed. Always. No extra fee, no separate selection needed.</p>
+          </div>
+          <div class="gift-how-step reveal-up" style="--reveal-delay:0.24s">
+            <span class="gift-how-step-num">04</span>
+            <h3 class="gift-how-step-title">Delivered directly</h3>
+            <p class="gift-how-step-body">Ship to yourself or directly to the recipient. Specify the address at checkout. No prices on the packaging. Ever.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bespoke / Corporate -->
+    <section class="gift-bespoke">
+      <div class="gift-bespoke-inner">
+        <div class="gift-bespoke-text">
+          <p class="section-label reveal-up">Corporate & Bespoke</p>
+          <h2 class="gift-bespoke-title reveal-up">Gifting at scale,<br>with the same <em>attention.</em></h2>
+          <p class="gift-bespoke-body reveal-up">Lantern works with companies, hotels, and event planners who need considered gifting in larger quantities. Every bespoke order is treated with the same care as a single purchase.</p>
+          <div class="gift-bespoke-items reveal-up">
+            <div class="gift-bespoke-item">Custom label or embossed note card with your message</div>
+            <div class="gift-bespoke-item">Minimum order 25 units, no upper limit</div>
+            <div class="gift-bespoke-item">Consistent fragrance curation across the full order</div>
+            <div class="gift-bespoke-item">Delivery coordination with your team</div>
+            <div class="gift-bespoke-item">Preferred pricing at scale</div>
+          </div>
+          <a href="mailto:gifting@lanterncandles.in" class="btn btn--primary reveal-up">Enquire About Corporate Gifting</a>
+        </div>
+        <div class="gift-bespoke-media reveal-up" style="--reveal-delay:0.15s">
+          <img src="hero_candle_1788712275307.png" alt="Lantern bespoke gift" class="gift-bespoke-img" loading="lazy">
+        </div>
+      </div>
+    </section>
+
+    <!-- Personal Note Form -->
+    <section class="gift-note-section">
+      <div class="gift-note-inner">
+        <p class="section-label reveal-up" style="text-align:center">Personalise Your Gift</p>
+        <h2 class="gift-note-title reveal-up">Add a note<br>to your order.</h2>
+        <p class="gift-note-sub reveal-up">Written by hand on unlined paper. Included with every gift order.</p>
+        <form class="gift-note-form reveal-up" id="noteForm" novalidate>
+          <div class="gift-form-row">
+            <label class="gift-form-label" for="giftFrom">From</label>
+            <input type="text" class="gift-form-input" id="giftFrom" placeholder="Your name" autocomplete="name">
+          </div>
+          <div class="gift-form-row">
+            <label class="gift-form-label" for="giftTo">To</label>
+            <input type="text" class="gift-form-input" id="giftTo" placeholder="Recipient's name">
+          </div>
+          <div class="gift-form-row">
+            <label class="gift-form-label" for="giftMessage">Your message</label>
+            <textarea class="gift-form-textarea" id="giftMessage" placeholder="Write something worth keeping…" maxlength="280"></textarea>
+            <p class="gift-form-note">Maximum 280 characters. Printed on handmade paper in a clean serif typeface.</p>
+          </div>
+          <button type="submit" class="btn btn--primary" style="width:100%">Save Note & Continue to Cart</button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="index.html" class="footer-logo"><span class="footer-logo-wordmark">Lantern</span><span class="footer-logo-sub">Scented Candles</span></a>
+        <p class="footer-tagline">Crafted for atmosphere.<br>Poured by hand. Made in India.</p>
+        <div class="footer-social"><a href="#" class="footer-social-link" aria-label="Instagram"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a></div>
+      </div>
+      <div class="footer-nav">
+        <div class="footer-nav-col"><h4 class="footer-nav-title">Shop</h4><ul class="footer-nav-list"><li><a href="collections.html" class="footer-nav-link">All Candles</a></li><li><a href="gifting.html" class="footer-nav-link">Gift Sets</a></li></ul></div>
+        <div class="footer-nav-col"><h4 class="footer-nav-title">Company</h4><ul class="footer-nav-list"><li><a href="story.html" class="footer-nav-link">Our Story</a></li><li><a href="journal.html" class="footer-nav-link">Journal</a></li></ul></div>
+        <div class="footer-nav-col"><h4 class="footer-nav-title">Help</h4><ul class="footer-nav-list"><li><a href="#" class="footer-nav-link">Shipping & Returns</a></li><li><a href="mailto:gifting@lanterncandles.in" class="footer-nav-link">Corporate Gifting</a></li></ul></div>
+      </div>
+    </div>
+    <div class="footer-bottom"><p class="footer-legal">© 2026 Lantern Scented Candles. All rights reserved.</p></div>
+  </footer>
+
+  <div class="cart-drawer" id="cartDrawer" aria-hidden="true" role="dialog" aria-label="Shopping cart">
+    <div class="cart-drawer-header"><h2 class="cart-drawer-title">Your Cart</h2><button class="cart-drawer-close" id="cartClose">×</button></div>
+    <div class="cart-drawer-body" id="cartBody"><div class="cart-empty" id="cartEmpty"><p class="cart-empty-text">Your cart is empty.</p><a href="collections.html" class="btn btn--outline btn--sm">Explore Candles</a></div><ul class="cart-items" id="cartItems"></ul></div>
+    <div class="cart-drawer-footer" id="cartFooter" hidden><div class="cart-subtotal"><span>Subtotal</span><span id="cartSubtotal">₹0</span></div><p class="cart-shipping-note">Complimentary shipping on orders above ₹1,500</p><button class="btn btn--primary btn--full">Proceed to Checkout</button></div>
+  </div>
+  <div class="cart-overlay" id="cartOverlay"></div>
+
+  <script src="main.js"></script>
+  <script>
+    // Gift note form
+    document.getElementById('noteForm')?.addEventListener('submit', e => {
+      e.preventDefault();
+      const from = document.getElementById('giftFrom').value.trim();
+      const to   = document.getElementById('giftTo').value.trim();
+      const msg  = document.getElementById('giftMessage').value.trim();
+      if (msg) {
+        sessionStorage.setItem('lantern-gift-note', JSON.stringify({ from, to, msg }));
+        const btn = e.target.querySelector('button[type="submit"]');
+        btn.textContent = 'Note Saved ✓';
+        btn.style.background = 'var(--c-cognac)';
+        setTimeout(() => {
+          btn.textContent = 'Save Note & Continue to Cart';
+          btn.style.background = '';
+        }, 2200);
+      }
+    });
+
+    // Char counter for message
+    const msgField = document.getElementById('giftMessage');
+    const noteEl   = document.querySelector('.gift-form-note');
+    msgField?.addEventListener('input', () => {
+      const remaining = 280 - msgField.value.length;
+      noteEl.textContent = `${remaining} characters remaining. Printed on handmade paper in a clean serif typeface.`;
+    });
+  </script>
+</body>
+</html>
