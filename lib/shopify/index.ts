@@ -1,4 +1,4 @@
-﻿import type {
+import type {
   ShopifyAPIResponse,
   GetProductsResponse,
   GetProductResponse,
@@ -33,6 +33,7 @@ import {
   getMockProduct,
   getMockCollections,
   getMockCollection,
+  getMockCart,
 } from './mock';
 
 // ─── Config ───────────────────────────────────────────────────────────────────
@@ -108,15 +109,17 @@ export async function getProducts(options?: {
   sortKey?: string;
   reverse?: boolean;
 }): Promise<Product[]> {
+  const catalogue = getMockProducts();
+
   if (!hasLiveCredentials()) {
-    return getMockProducts();
+    return catalogue;
   }
 
   try {
     const { data } = await shopifyFetch<GetProductsResponse>({
       query: GET_PRODUCTS_QUERY,
       variables: {
-        first: options?.first ?? 20,
+        first: options?.first ?? 50,
         after: options?.after,
         query: options?.query,
         sortKey: options?.sortKey,
@@ -125,30 +128,85 @@ export async function getProducts(options?: {
       tags: ['products'],
     });
 
-    return data.products.nodes ?? data.products.edges.map((e) => e.node);
+    const liveNodes = data.products.nodes ?? data.products.edges?.map((e) => e.node) ?? [];
+    const liveMap = new Map<string, Product>();
+    for (const p of liveNodes) {
+      liveMap.set(p.handle, p);
+    }
+
+    // Merge live availability, pricing, and variants into catalogue products
+    const merged = catalogue.map((item) => {
+      const live = liveMap.get(item.handle);
+      if (live) {
+        return {
+          ...item,
+          availableForSale: live.availableForSale,
+          priceRange: live.priceRange || item.priceRange,
+          variants: live.variants?.nodes?.length || live.variants?.edges?.length ? live.variants : item.variants,
+        };
+      }
+      return item;
+    });
+
+    // Also include any new products in Shopify not in catalogue
+    for (const live of liveNodes) {
+      if (!catalogue.some((c) => c.handle === live.handle)) {
+        merged.push(live);
+      }
+    }
+
+    return merged;
   } catch (error) {
-    console.warn('[shopify] getProducts fell back to mock data:', (error as Error).message);
-    return getMockProducts();
+    console.warn('[shopify] getProducts fell back to catalogue:', (error as Error).message);
+    return catalogue;
   }
 }
 
 export async function getProduct(handle: string): Promise<Product | null> {
-  if (!hasLiveCredentials()) {
-    return getMockProduct(handle);
+  const catalogueProduct = getMockProduct(handle);
+
+  if (catalogueProduct) {
+    if (hasLiveCredentials()) {
+      try {
+        const { data } = await shopifyFetch<GetProductResponse>({
+          query: GET_PRODUCT_QUERY,
+          variables: { handle },
+          tags: [`product-${handle}`],
+        });
+
+        if (data.productByHandle) {
+          const live = data.productByHandle;
+          return {
+            ...catalogueProduct,
+            availableForSale: live.availableForSale,
+            priceRange: live.priceRange || catalogueProduct.priceRange,
+            variants: live.variants?.nodes?.length || live.variants?.edges?.length ? live.variants : catalogueProduct.variants,
+          };
+        }
+      } catch (error) {
+        console.warn(`[shopify] live sync for product (${handle}) skipped:`, (error as Error).message);
+      }
+    }
+    return catalogueProduct;
   }
 
-  try {
-    const { data } = await shopifyFetch<GetProductResponse>({
-      query: GET_PRODUCT_QUERY,
-      variables: { handle },
-      tags: [`product-${handle}`],
-    });
+  // Not in local catalogue: query Shopify for any new products created in Shopify Admin
+  if (hasLiveCredentials()) {
+    try {
+      const { data } = await shopifyFetch<GetProductResponse>({
+        query: GET_PRODUCT_QUERY,
+        variables: { handle },
+        tags: [`product-${handle}`],
+      });
 
-    return data.productByHandle ?? null;
-  } catch (error) {
-    console.warn(`[shopify] getProduct(${handle}) fell back to mock data:`, (error as Error).message);
-    return getMockProduct(handle);
+      return data.productByHandle ?? null;
+    } catch (error) {
+      console.warn(`[shopify] getProduct(${handle}) error:`, (error as Error).message);
+      return null;
+    }
   }
+
+  return null;
 }
 
 // ─── Collections ──────────────────────────────────────────────────────────────
@@ -157,25 +215,7 @@ export async function getCollections(options?: {
   first?: number;
   after?: string;
 }): Promise<Collection[]> {
-  if (!hasLiveCredentials()) {
-    return getMockCollections();
-  }
-
-  try {
-    const { data } = await shopifyFetch<GetCollectionsResponse>({
-      query: GET_COLLECTIONS_QUERY,
-      variables: {
-        first: options?.first ?? 20,
-        after: options?.after,
-      },
-      tags: ['collections'],
-    });
-
-    return data.collections.nodes ?? data.collections.edges.map((e) => e.node);
-  } catch (error) {
-    console.warn('[shopify] getCollections fell back to mock data:', (error as Error).message);
-    return getMockCollections();
-  }
+  return getMockCollections();
 }
 
 export async function getCollection(
@@ -187,28 +227,61 @@ export async function getCollection(
     reverse?: boolean;
   }
 ): Promise<Collection | null> {
-  if (!hasLiveCredentials()) {
-    return getMockCollection(handle);
+  const normalized = handle.toLowerCase();
+  const mockCol = getMockCollection(normalized);
+
+  if (mockCol) {
+    if (hasLiveCredentials()) {
+      try {
+        const allEnrichedProducts = await getProducts();
+        const collectionProducts =
+          normalized === 'all' || normalized === 'all-candles' || normalized === 'shop'
+            ? allEnrichedProducts
+            : allEnrichedProducts.filter((p) => p.category === normalized);
+
+        return {
+          ...mockCol,
+          products: {
+            edges: collectionProducts.map((p) => ({ cursor: p.id, node: p })),
+            nodes: collectionProducts,
+            pageInfo: {
+              hasNextPage: false,
+              hasPreviousPage: false,
+              startCursor: collectionProducts[0]?.id ?? null,
+              endCursor: collectionProducts[collectionProducts.length - 1]?.id ?? null,
+            },
+          },
+        };
+      } catch {
+        return mockCol;
+      }
+    }
+    return mockCol;
   }
 
-  try {
-    const { data } = await shopifyFetch<GetCollectionResponse>({
-      query: GET_COLLECTION_QUERY,
-      variables: {
-        handle,
-        first: options?.first ?? 20,
-        after: options?.after,
-        sortKey: options?.sortKey,
-        reverse: options?.reverse,
-      },
-      tags: [`collection-${handle}`],
-    });
+  // Not in mock collections: try Shopify directly for any custom collections created in Shopify Admin
+  if (hasLiveCredentials()) {
+    try {
+      const { data } = await shopifyFetch<GetCollectionResponse>({
+        query: GET_COLLECTION_QUERY,
+        variables: {
+          handle: normalized,
+          first: options?.first ?? 20,
+          after: options?.after,
+          sortKey: options?.sortKey,
+          reverse: options?.reverse,
+        },
+        tags: [`collection-${normalized}`],
+      });
 
-    return data.collectionByHandle ?? null;
-  } catch (error) {
-    console.warn(`[shopify] getCollection(${handle}) fell back to mock data:`, (error as Error).message);
-    return getMockCollection(handle);
+      return data.collectionByHandle ?? null;
+    } catch (error) {
+      console.warn(`[shopify] getCollection(${normalized}) error:`, (error as Error).message);
+      return null;
+    }
   }
+
+  return null;
 }
 
 // ─── Cart ─────────────────────────────────────────────────────────────────────
@@ -216,79 +289,118 @@ export async function getCollection(
 export async function createCart(
   lines: CartLineInput[] = []
 ): Promise<Cart> {
-  const { data } = await shopifyFetch<CreateCartResponse>({
-    query: CREATE_CART_MUTATION,
-    variables: { input: { lines } },
-    cache: 'no-store',
-  });
-
-  if (data.cartCreate.userErrors.length > 0) {
-    throw new Error(
-      data.cartCreate.userErrors.map((e) => e.message).join('; ')
-    );
+  if (!hasLiveCredentials()) {
+    return getMockCart();
   }
 
-  return data.cartCreate.cart;
+  try {
+    const { data } = await shopifyFetch<CreateCartResponse>({
+      query: CREATE_CART_MUTATION,
+      variables: { input: { lines } },
+      cache: 'no-store',
+    });
+
+    if (data.cartCreate.userErrors.length > 0) {
+      console.warn('[shopify] cartCreate userErrors:', data.cartCreate.userErrors.map((e) => e.message).join('; '));
+      return getMockCart();
+    }
+
+    return data.cartCreate.cart;
+  } catch (error) {
+    console.warn('[shopify] createCart error, falling back to mock cart:', (error as Error).message);
+    return getMockCart();
+  }
 }
 
 export async function addToCart(
   cartId: string,
   lines: CartLineInput[]
 ): Promise<Cart> {
-  const { data } = await shopifyFetch<AddToCartResponse>({
-    query: ADD_TO_CART_MUTATION,
-    variables: { cartId, lines },
-    cache: 'no-store',
-  });
-
-  if (data.cartLinesAdd.userErrors.length > 0) {
-    throw new Error(
-      data.cartLinesAdd.userErrors.map((e) => e.message).join('; ')
-    );
+  if (!hasLiveCredentials() || cartId.includes('mock-session-cart')) {
+    return getMockCart();
   }
 
-  return data.cartLinesAdd.cart;
+  try {
+    const { data } = await shopifyFetch<AddToCartResponse>({
+      query: ADD_TO_CART_MUTATION,
+      variables: { cartId, lines },
+      cache: 'no-store',
+    });
+
+    if (data.cartLinesAdd.userErrors.length > 0) {
+      throw new Error(
+        data.cartLinesAdd.userErrors.map((e) => e.message).join('; ')
+      );
+    }
+
+    return data.cartLinesAdd.cart;
+  } catch (error) {
+    console.error('[shopify] addToCart error:', (error as Error).message);
+    throw error;
+  }
 }
 
 export async function removeFromCart(
   cartId: string,
   lineIds: string[]
 ): Promise<Cart> {
-  const { data } = await shopifyFetch<RemoveFromCartResponse>({
-    query: REMOVE_FROM_CART_MUTATION,
-    variables: { cartId, lineIds },
-    cache: 'no-store',
-  });
-
-  if (data.cartLinesRemove.userErrors.length > 0) {
-    throw new Error(
-      data.cartLinesRemove.userErrors.map((e) => e.message).join('; ')
-    );
+  if (!hasLiveCredentials() || cartId.includes('mock-session-cart')) {
+    return getMockCart();
   }
 
-  return data.cartLinesRemove.cart;
+  try {
+    const { data } = await shopifyFetch<RemoveFromCartResponse>({
+      query: REMOVE_FROM_CART_MUTATION,
+      variables: { cartId, lineIds },
+      cache: 'no-store',
+    });
+
+    if (data.cartLinesRemove.userErrors.length > 0) {
+      throw new Error(
+        data.cartLinesRemove.userErrors.map((e) => e.message).join('; ')
+      );
+    }
+
+    return data.cartLinesRemove.cart;
+  } catch (error) {
+    console.error('[shopify] removeFromCart error:', (error as Error).message);
+    throw error;
+  }
 }
 
 export async function updateCartQuantity(
   cartId: string,
   lines: CartLineUpdateInput[]
 ): Promise<Cart> {
-  const { data } = await shopifyFetch<UpdateCartLineResponse>({
-    query: UPDATE_CART_LINE_MUTATION,
-    variables: { cartId, lines },
-    cache: 'no-store',
-  });
-
-  if (data.cartLinesUpdate.userErrors.length > 0) {
-    throw new Error(
-      data.cartLinesUpdate.userErrors.map((e) => e.message).join('; ')
-    );
+  if (!hasLiveCredentials() || cartId.includes('mock-session-cart')) {
+    return getMockCart();
   }
 
-  return data.cartLinesUpdate.cart;
+  try {
+    const { data } = await shopifyFetch<UpdateCartLineResponse>({
+      query: UPDATE_CART_LINE_MUTATION,
+      variables: { cartId, lines },
+      cache: 'no-store',
+    });
+
+    if (data.cartLinesUpdate.userErrors.length > 0) {
+      throw new Error(
+        data.cartLinesUpdate.userErrors.map((e) => e.message).join('; ')
+      );
+    }
+
+    return data.cartLinesUpdate.cart;
+  } catch (error) {
+    console.error('[shopify] updateCartQuantity error:', (error as Error).message);
+    throw error;
+  }
 }
 
 export async function getCart(cartId: string): Promise<Cart | null> {
+  if (!hasLiveCredentials() || cartId.includes('mock-session-cart')) {
+    return null;
+  }
+
   try {
     const { data } = await shopifyFetch<GetCartResponse>({
       query: GET_CART_QUERY,
