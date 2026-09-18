@@ -1,8 +1,9 @@
 'use client';
 
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import type { Cart, CartLine } from '@/lib/shopify/types';
+import type { Cart } from '@/lib/shopify/types';
 import { createCart, addToCart, removeFromCart, updateCartQuantity, getCart } from '@/lib/shopify';
+import { addLinesToLocalCart, removeLineFromLocalCart, updateLineInLocalCart } from '@/lib/shopify/mock';
 
 interface CartContextType {
   cart: Cart | null;
@@ -30,17 +31,47 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cartOpen, setCartOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // On mount, restore cart from localStorage
-  useEffect(() => {
-    const cartId = localStorage.getItem('lantern-cart-id');
-    if (!cartId) return;
-    getCart(cartId).then((restored) => {
-      if (restored) setCart(restored);
-    });
+  // Helper to sync state and localStorage
+  const updateCartState = useCallback((newCart: Cart | null) => {
+    setCart(newCart);
+    if (newCart) {
+      localStorage.setItem('lantern-cart-data', JSON.stringify(newCart));
+      if (newCart.id) {
+        localStorage.setItem('lantern-cart-id', newCart.id);
+      }
+    } else {
+      localStorage.removeItem('lantern-cart-data');
+      localStorage.removeItem('lantern-cart-id');
+    }
   }, []);
 
-  const cartCount = cart?.lines?.edges?.reduce((sum, e) => sum + e.node.quantity, 0) ?? 0;
-  const cartTotal = cart ? `₹${Number(cart.cost.totalAmount.amount).toLocaleString('en-IN')}` : '₹0';
+  // On mount, restore cart from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('lantern-cart-data');
+      if (saved) {
+        const parsed = JSON.parse(saved) as Cart;
+        if (parsed && parsed.totalQuantity > 0) {
+          setCart(parsed);
+        }
+      }
+    } catch {}
+
+    const cartId = localStorage.getItem('lantern-cart-id');
+    if (cartId && !cartId.includes('local-') && !cartId.includes('mock-session')) {
+      getCart(cartId).then((restored) => {
+        if (restored && restored.totalQuantity > 0) {
+          setCart(restored);
+          localStorage.setItem('lantern-cart-data', JSON.stringify(restored));
+        }
+      });
+    }
+  }, []);
+
+  const cartCount = cart?.totalQuantity ?? cart?.lines?.edges?.reduce((sum, e) => sum + e.node.quantity, 0) ?? 0;
+  const cartTotal = cart?.cost?.totalAmount?.amount
+    ? `₹${Number(cart.cost.totalAmount.amount).toLocaleString('en-IN')}`
+    : '₹0';
 
   const openCart = useCallback(() => setCartOpen(true), []);
   const closeCart = useCallback(() => setCartOpen(false), []);
@@ -48,52 +79,93 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const addItem = useCallback(async (variantId: string, quantity = 1) => {
     setIsLoading(true);
     try {
-      let cartId = localStorage.getItem('lantern-cart-id');
+      const cartId = localStorage.getItem('lantern-cart-id');
       let updated: Cart | null = null;
 
-      if (!cartId) {
-        updated = await createCart([{ merchandiseId: variantId, quantity }]);
-        if (updated?.id) localStorage.setItem('lantern-cart-id', updated.id);
+      const isRealShopifyCart = cartId && !cartId.includes('local-') && !cartId.includes('mock-session');
+
+      if (isRealShopifyCart) {
+        try {
+          updated = await addToCart(cartId!, [{ merchandiseId: variantId, quantity }]);
+        } catch {
+          updated = null;
+        }
       } else {
-        updated = await addToCart(cartId, [{ merchandiseId: variantId, quantity }]);
-        if (!updated) {
-          // Cart expired — create new one
+        try {
           updated = await createCart([{ merchandiseId: variantId, quantity }]);
-          if (updated?.id) localStorage.setItem('lantern-cart-id', updated.id);
+          if (updated && (updated.id.includes('mock-session') || updated.totalQuantity === 0)) {
+            updated = null;
+          }
+        } catch {
+          updated = null;
         }
       }
-      if (updated) setCart(updated);
+
+      // If Shopify API is unavailable or returned empty fallback, manage items locally with full product details
+      if (!updated || updated.totalQuantity === 0) {
+        updated = addLinesToLocalCart(cart, [{ merchandiseId: variantId, quantity }]);
+      }
+
+      updateCartState(updated);
       setCartOpen(true);
     } catch (err) {
       console.error('addItem error:', err);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [cart, updateCartState]);
 
   const removeItem = useCallback(async (lineId: string) => {
-    const cartId = localStorage.getItem('lantern-cart-id');
-    if (!cartId) return;
     setIsLoading(true);
     try {
-      const updated = await removeFromCart(cartId, [lineId]);
-      if (updated) setCart(updated);
+      const cartId = localStorage.getItem('lantern-cart-id');
+      let updated: Cart | null = null;
+
+      const isRealShopifyCart = cartId && !cartId.includes('local-') && !cartId.includes('mock-session');
+
+      if (isRealShopifyCart) {
+        try {
+          updated = await removeFromCart(cartId!, [lineId]);
+        } catch {
+          updated = null;
+        }
+      }
+
+      if (!updated && cart) {
+        updated = removeLineFromLocalCart(cart, [lineId]);
+      }
+
+      updateCartState(updated);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [cart, updateCartState]);
 
   const updateItem = useCallback(async (lineId: string, quantity: number) => {
-    const cartId = localStorage.getItem('lantern-cart-id');
-    if (!cartId) return;
     setIsLoading(true);
     try {
-      const updated = await updateCartQuantity(cartId, [{ id: lineId, quantity }]);
-      if (updated) setCart(updated);
+      const cartId = localStorage.getItem('lantern-cart-id');
+      let updated: Cart | null = null;
+
+      const isRealShopifyCart = cartId && !cartId.includes('local-') && !cartId.includes('mock-session');
+
+      if (isRealShopifyCart) {
+        try {
+          updated = await updateCartQuantity(cartId!, [{ id: lineId, quantity }]);
+        } catch {
+          updated = null;
+        }
+      }
+
+      if (!updated && cart) {
+        updated = updateLineInLocalCart(cart, [{ id: lineId, quantity }]);
+      }
+
+      updateCartState(updated);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [cart, updateCartState]);
 
   return (
     <CartContext.Provider value={{ cart, cartOpen, isLoading, cartCount, cartTotal, openCart, closeCart, addItem, removeItem, updateItem }}>

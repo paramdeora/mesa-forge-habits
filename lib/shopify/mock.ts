@@ -1,4 +1,4 @@
-import type { Product, ProductVariant, Collection, Cart, ShopifyImage, MoneyV2 } from './types';
+import type { Product, ProductVariant, Collection, Cart, CartLine, ShopifyImage, MoneyV2 } from './types';
 import { PRODUCTS, CATEGORIES, type CatalogueProduct } from './products';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -174,5 +174,188 @@ export function getMockCart(): Cart {
     },
     createdAt: now,
     updatedAt: now,
+  };
+}
+
+export function addLinesToLocalCart(
+  currentCart: Cart | null,
+  newLines: { merchandiseId: string; quantity: number }[]
+): Cart {
+  const existingNodes: CartLine[] =
+    currentCart?.lines?.nodes ?? currentCart?.lines?.edges?.map((e) => e.node) ?? [];
+  const linesMap = new Map<string, CartLine>();
+
+  for (const l of existingNodes) {
+    linesMap.set(l.merchandise.id, { ...l });
+  }
+
+  for (const input of newLines) {
+    const p = PRODUCTS.find(
+      (prod) =>
+        prod.shopifyVariantId === input.merchandiseId ||
+        prod.id === input.merchandiseId ||
+        prod.shopifyProductId === input.merchandiseId
+    );
+    if (!p) continue;
+
+    const existing = linesMap.get(p.shopifyVariantId);
+    const newQty = (existing?.quantity ?? 0) + input.quantity;
+    const unitPrice = p.price;
+    const totalLinePrice = unitPrice * newQty;
+    const primaryImg = toShopifyImage(p.images.primary, p.images.alt);
+
+    const line: CartLine = {
+      id: `gid://shopify/CartLine/${p.shopifyVariantId}`,
+      quantity: newQty,
+      attributes: [],
+      cost: {
+        totalAmount: inrMoney(totalLinePrice),
+        amountPerQuantity: inrMoney(unitPrice),
+        compareAtAmountPerQuantity: p.compareAtPrice ? inrMoney(p.compareAtPrice) : null,
+        subtotalAmount: inrMoney(totalLinePrice),
+      },
+      merchandise: {
+        id: p.shopifyVariantId,
+        title: p.size,
+        availableForSale: p.stockStatus === 'in_stock',
+        selectedOptions: [{ name: 'Size', value: p.size }],
+        price: inrMoney(unitPrice),
+        compareAtPrice: p.compareAtPrice ? inrMoney(p.compareAtPrice) : null,
+        sku: `LTN-${p.slug.toUpperCase().replace(/-/g, '')}`,
+        barcode: null,
+        weight: 100,
+        weightUnit: 'GRAMS',
+        image: primaryImg,
+        quantityAvailable: 50,
+        product: {
+          id: p.shopifyProductId,
+          handle: p.slug,
+          title: p.name,
+          featuredImage: primaryImg,
+          priceRange: {
+            minVariantPrice: inrMoney(unitPrice),
+            maxVariantPrice: inrMoney(unitPrice),
+          },
+        },
+      },
+      estimatedCost: {
+        totalAmount: inrMoney(totalLinePrice),
+        subtotalAmount: inrMoney(totalLinePrice),
+      },
+    };
+
+    linesMap.set(p.shopifyVariantId, line);
+  }
+
+  const updatedNodes = Array.from(linesMap.values());
+  const totalQty = updatedNodes.reduce((sum, n) => sum + n.quantity, 0);
+  const totalSum = updatedNodes.reduce((sum, n) => sum + Number(n.cost.totalAmount.amount), 0);
+
+  return {
+    id: currentCart?.id && !currentCart.id.includes('mock-session-cart')
+      ? currentCart.id
+      : `gid://shopify/Cart/local-${Date.now()}`,
+    checkoutUrl: `https://${process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN || 'lantern-candles.myshopify.com'}/cart`,
+    cost: {
+      subtotalAmount: inrMoney(totalSum),
+      totalAmount: inrMoney(totalSum),
+      totalTaxAmount: inrMoney(0),
+      totalDutyAmount: null,
+      checkoutChargeAmount: inrMoney(totalSum),
+    },
+    lines: {
+      edges: updatedNodes.map((n) => ({ cursor: n.id, node: n })),
+      nodes: updatedNodes,
+    },
+    totalQuantity: totalQty,
+    note: null,
+    attributes: [],
+    discountCodes: [],
+    buyerIdentity: {
+      email: null,
+      phone: null,
+      countryCode: 'IN',
+    },
+    createdAt: currentCart?.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+export function removeLineFromLocalCart(currentCart: Cart, lineIds: string[]): Cart {
+  const existingNodes: CartLine[] =
+    currentCart?.lines?.nodes ?? currentCart?.lines?.edges?.map((e) => e.node) ?? [];
+  const updatedNodes = existingNodes.filter((n) => !lineIds.includes(n.id) && !lineIds.includes(n.merchandise.id));
+  const totalQty = updatedNodes.reduce((sum, n) => sum + n.quantity, 0);
+  const totalSum = updatedNodes.reduce((sum, n) => sum + Number(n.cost.totalAmount.amount), 0);
+
+  return {
+    ...currentCart,
+    cost: {
+      subtotalAmount: inrMoney(totalSum),
+      totalAmount: inrMoney(totalSum),
+      totalTaxAmount: inrMoney(0),
+      totalDutyAmount: null,
+      checkoutChargeAmount: inrMoney(totalSum),
+    },
+    lines: {
+      edges: updatedNodes.map((n) => ({ cursor: n.id, node: n })),
+      nodes: updatedNodes,
+    },
+    totalQuantity: totalQty,
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+export function updateLineInLocalCart(
+  currentCart: Cart,
+  updates: { id: string; quantity: number }[]
+): Cart {
+  const existingNodes: CartLine[] =
+    currentCart?.lines?.nodes ?? currentCart?.lines?.edges?.map((e) => e.node) ?? [];
+  const updatedNodes: CartLine[] = [];
+
+  for (const node of existingNodes) {
+    const upd = updates.find((u) => u.id === node.id || u.id === node.merchandise.id);
+    if (upd) {
+      if (upd.quantity > 0) {
+        const unitPrice = Number(node.cost.amountPerQuantity.amount);
+        const totalLinePrice = unitPrice * upd.quantity;
+        updatedNodes.push({
+          ...node,
+          quantity: upd.quantity,
+          cost: {
+            ...node.cost,
+            totalAmount: inrMoney(totalLinePrice),
+            subtotalAmount: inrMoney(totalLinePrice),
+          },
+          estimatedCost: {
+            totalAmount: inrMoney(totalLinePrice),
+            subtotalAmount: inrMoney(totalLinePrice),
+          },
+        });
+      }
+    } else {
+      updatedNodes.push(node);
+    }
+  }
+
+  const totalQty = updatedNodes.reduce((sum, n) => sum + n.quantity, 0);
+  const totalSum = updatedNodes.reduce((sum, n) => sum + Number(n.cost.totalAmount.amount), 0);
+
+  return {
+    ...currentCart,
+    cost: {
+      subtotalAmount: inrMoney(totalSum),
+      totalAmount: inrMoney(totalSum),
+      totalTaxAmount: inrMoney(0),
+      totalDutyAmount: null,
+      checkoutChargeAmount: inrMoney(totalSum),
+    },
+    lines: {
+      edges: updatedNodes.map((n) => ({ cursor: n.id, node: n })),
+      nodes: updatedNodes,
+    },
+    totalQuantity: totalQty,
+    updatedAt: new Date().toISOString(),
   };
 }

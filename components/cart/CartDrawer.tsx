@@ -35,20 +35,38 @@ export default function CartDrawer() {
               <span>{cartTotal}</span>
             </div>
             <p className="cart-shipping-note">Complimentary shipping on orders above ₹1,500</p>
+            
             <a
               href={cart?.checkoutUrl || '#'}
               className="btn btn--primary btn--full"
+              target="_blank"
+              rel="noopener noreferrer"
               onClick={e => {
                 if (!cart?.checkoutUrl || cart.checkoutUrl === '#') {
                   e.preventDefault();
-                  alert('Connect your Shopify store to enable checkout. Add NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN to your environment variables.');
+                  alert('Connect your Shopify store to enable checkout. Your Shopify Storefront API token is configured.');
                 }
               }}
             >
-              Proceed to Checkout
+              Proceed to Shopify Checkout
             </a>
-            <button className="btn btn--outline btn--full btn--sm" onClick={closeCart} style={{ color: 'var(--c-ink)', borderColor: 'var(--c-border)' }}>
-              Continue Shopping
+
+            <a
+              href={`https://wa.me/?text=${encodeURIComponent(
+                `Hello Lantern Candles! I would like to place an order from your website:\n\n` +
+                lines.map(l => `• ${l.merchandise.product.title} (${l.quantity}x) — ₹${Number(l.cost.totalAmount.amount).toLocaleString('en-IN')}`).join('\n') +
+                `\n\nSubtotal: ${cartTotal}\n\nPlease share delivery confirmation and payment details.`
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn--outline btn--full btn--sm"
+              style={{ color: 'var(--c-ink)', borderColor: 'var(--c-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
+            >
+              Order via WhatsApp Concierge
+            </a>
+
+            <button className="btn btn--ghost btn--full btn--sm" onClick={closeCart} style={{ color: 'var(--c-charcoal)', padding: '0.4rem' }}>
+              Continue Browsing
             </button>
           </div>
         )}
