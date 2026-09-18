@@ -122,6 +122,20 @@ export interface Product {
   collections?: {
     edges: Array<{ node: { title: string; handle?: string } }>;
   };
+  category?: 'rituals' | 'aesthetic' | 'gifting';
+  tagline?: string;
+  size?: string;
+  isConcept?: boolean;
+  safetyWarning?: string;
+  benefits?: string[];
+  vessel?: string;
+  materials?: string;
+  burnTime?: string;
+  fragranceNotes?: {
+    top: string[];
+    heart: string[];
+    base: string[];
+  };
 }
 
 export interface PageInfo {

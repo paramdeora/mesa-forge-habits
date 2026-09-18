@@ -10,10 +10,11 @@ interface MobileMenuProps {
 
 const NAV_LINKS = [
   { label: 'Shop', href: '/collections/all' },
-  { label: 'Collections', href: '/collections/all' },
-  { label: 'Our Story', href: '/story' },
-  { label: 'Journal', href: '/journal' },
+  { label: 'Rituals', href: '/collections/rituals' },
+  { label: 'Aesthetic', href: '/collections/aesthetic' },
   { label: 'Gifting', href: '/gifting' },
+  { label: 'Our Story', href: '/story' },
+  { label: 'Contact', href: '/contact' },
 ];
 
 export default function MobileMenu({ isOpen, onClose, onSearchOpen }: MobileMenuProps) {
@@ -25,8 +26,10 @@ export default function MobileMenu({ isOpen, onClose, onSearchOpen }: MobileMenu
           <button className="mobile-menu-close" onClick={onClose} aria-label="Close menu">×</button>
         </div>
         <nav className="mobile-nav">
-          {NAV_LINKS.map(link => (
-            <Link key={link.href + link.label} href={link.href} className="mobile-nav-link" onClick={onClose}>{link.label}</Link>
+          {NAV_LINKS.map((link) => (
+            <Link key={link.href + link.label} href={link.href} className="mobile-nav-link" onClick={onClose}>
+              {link.label}
+            </Link>
           ))}
         </nav>
         <div className="mobile-menu-footer">
