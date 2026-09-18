@@ -19,10 +19,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 const COLLECTION_TABS = [
-  { label: 'All Pieces', handle: 'all' },
-  { label: 'Rituals', handle: 'rituals' },
-  { label: 'Aesthetic', handle: 'aesthetic' },
-  { label: 'Gifting', handle: 'gifting' },
+  { label: 'All Pieces', handle: 'all', count: 14 },
+  { label: 'Rituals', handle: 'rituals', count: 6 },
+  { label: 'Aesthetic', handle: 'aesthetic', count: 3 },
+  { label: 'Gifting', handle: 'gifting', count: 5 },
 ];
 
 export default async function CollectionPage({ params }: Props) {
@@ -51,27 +51,17 @@ export default async function CollectionPage({ params }: Props) {
   return (
     <>
       {/* Page Hero */}
-      <div style={{
-        background: 'var(--c-cream)',
-        paddingBlock: 'clamp(3.5rem,7vw,6.5rem)',
-        borderBottom: '1px solid var(--c-border-light)',
-      }}>
-        <div className="container container--narrow" style={{ textAlign: 'center' }}>
+      <div className="collection-hero">
+        <div className="container container--narrow">
           <RevealUp>
-            <span className="section-label" style={{ justifyContent: 'center', display: 'flex', marginBottom: '0.75rem' }}>
+            <span className="collection-hero-eyebrow">
               {categoryMeta.eyebrow}
             </span>
-            <h1 className="section-title" style={{ marginBottom: '1.25rem' }}>
+            <h1 className="collection-hero-title">
               {categoryMeta.title}
             </h1>
             {categoryMeta.description && (
-              <p style={{
-                color: 'var(--c-charcoal)',
-                fontSize: 'var(--t-md)',
-                lineHeight: 1.85,
-                maxWidth: '680px',
-                margin: '0 auto',
-              }}>
+              <p className="collection-hero-desc">
                 {categoryMeta.description}
               </p>
             )}
@@ -80,37 +70,25 @@ export default async function CollectionPage({ params }: Props) {
       </div>
 
       {/* Filter tabs */}
-      <div style={{
-        borderBottom: '1px solid var(--c-border-light)',
-        background: 'var(--c-ivory)',
-        position: 'sticky',
-        top: 'var(--nav-h)',
-        zIndex: 10,
-      }}>
+      <div className="collection-tabs-bar">
         <div className="container">
           <nav
-            style={{
-              display: 'flex',
-              gap: '0.5rem',
-              paddingBlock: '1rem',
-              overflowX: 'auto',
-              scrollbarWidth: 'none',
-            }}
+            className="collection-tabs-nav"
             aria-label="Collection category filters"
           >
             {COLLECTION_TABS.map((tab) => {
-              const isActive = tab.handle === normalizedHandle || (normalizedHandle === 'shop' && tab.handle === 'all');
+              const isActive =
+                tab.handle === normalizedHandle ||
+                (normalizedHandle === 'shop' && tab.handle === 'all');
               return (
                 <Link
                   key={tab.handle}
                   href={`/collections/${tab.handle}`}
-                  className={`btn btn--sm ${isActive ? 'btn--primary' : 'btn--ghost'}`}
-                  style={{
-                    whiteSpace: 'nowrap',
-                    borderColor: isActive ? 'var(--c-ink)' : 'var(--c-border)',
-                  }}
+                  className={`collection-tab ${isActive ? 'is-active' : ''}`}
+                  aria-current={isActive ? 'page' : undefined}
                 >
-                  {tab.label}
+                  <span className="collection-tab-label">{tab.label}</span>
+                  <span className="collection-tab-count">({tab.count})</span>
                 </Link>
               );
             })}
