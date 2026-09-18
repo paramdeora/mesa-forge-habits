@@ -1,4 +1,4 @@
-﻿// ─── Fragment Definitions ─────────────────────────────────────────────────────
+// ─── Fragment Definitions ─────────────────────────────────────────────────────
 
 export const IMAGE_FRAGMENT = /* GraphQL */ `
   fragment ImageFields on Image {
@@ -33,7 +33,6 @@ export const PRODUCT_VARIANT_FRAGMENT = /* GraphQL */ `
     barcode
     weight
     weightUnit
-    quantityAvailable
     selectedOptions {
       name
       value
@@ -48,8 +47,6 @@ export const PRODUCT_VARIANT_FRAGMENT = /* GraphQL */ `
       ...ImageFields
     }
   }
-  ${MONEY_FRAGMENT}
-  ${IMAGE_FRAGMENT}
 `;
 
 export const PRODUCT_FRAGMENT = /* GraphQL */ `
@@ -106,10 +103,6 @@ export const PRODUCT_FRAGMENT = /* GraphQL */ `
       ...SEOFields
     }
   }
-  ${MONEY_FRAGMENT}
-  ${IMAGE_FRAGMENT}
-  ${PRODUCT_VARIANT_FRAGMENT}
-  ${SEO_FRAGMENT}
 `;
 
 export const COLLECTION_FRAGMENT = /* GraphQL */ `
@@ -127,8 +120,6 @@ export const COLLECTION_FRAGMENT = /* GraphQL */ `
       ...SEOFields
     }
   }
-  ${IMAGE_FRAGMENT}
-  ${SEO_FRAGMENT}
 `;
 
 export const CART_LINE_FRAGMENT = /* GraphQL */ `
@@ -172,8 +163,6 @@ export const CART_LINE_FRAGMENT = /* GraphQL */ `
       }
     }
   }
-  ${MONEY_FRAGMENT}
-  ${IMAGE_FRAGMENT}
 `;
 
 export const CART_FRAGMENT = /* GraphQL */ `
@@ -210,8 +199,38 @@ export const CART_FRAGMENT = /* GraphQL */ `
       }
     }
   }
+`;
+
+// ─── Fragment Packs (Deduplicated) ───────────────────────────────────────────
+
+const PRODUCT_FRAGMENTS = /* GraphQL */ `
+  ${PRODUCT_FRAGMENT}
+  ${PRODUCT_VARIANT_FRAGMENT}
+  ${IMAGE_FRAGMENT}
   ${MONEY_FRAGMENT}
+  ${SEO_FRAGMENT}
+`;
+
+const COLLECTION_FRAGMENTS = /* GraphQL */ `
+  ${COLLECTION_FRAGMENT}
+  ${IMAGE_FRAGMENT}
+  ${SEO_FRAGMENT}
+`;
+
+const COLLECTION_WITH_PRODUCTS_FRAGMENTS = /* GraphQL */ `
+  ${COLLECTION_FRAGMENT}
+  ${PRODUCT_FRAGMENT}
+  ${PRODUCT_VARIANT_FRAGMENT}
+  ${IMAGE_FRAGMENT}
+  ${MONEY_FRAGMENT}
+  ${SEO_FRAGMENT}
+`;
+
+const CART_FRAGMENTS = /* GraphQL */ `
+  ${CART_FRAGMENT}
   ${CART_LINE_FRAGMENT}
+  ${IMAGE_FRAGMENT}
+  ${MONEY_FRAGMENT}
 `;
 
 // ─── Product Queries ──────────────────────────────────────────────────────────
@@ -236,7 +255,7 @@ export const GET_PRODUCTS_QUERY = /* GraphQL */ `
       }
     }
   }
-  ${PRODUCT_FRAGMENT}
+  ${PRODUCT_FRAGMENTS}
 `;
 
 export const GET_PRODUCT_QUERY = /* GraphQL */ `
@@ -245,7 +264,7 @@ export const GET_PRODUCT_QUERY = /* GraphQL */ `
       ...ProductFields
     }
   }
-  ${PRODUCT_FRAGMENT}
+  ${PRODUCT_FRAGMENTS}
 `;
 
 // ─── Collection Queries ───────────────────────────────────────────────────────
@@ -270,7 +289,7 @@ export const GET_COLLECTIONS_QUERY = /* GraphQL */ `
       }
     }
   }
-  ${COLLECTION_FRAGMENT}
+  ${COLLECTION_FRAGMENTS}
 `;
 
 export const GET_COLLECTION_QUERY = /* GraphQL */ `
@@ -296,8 +315,7 @@ export const GET_COLLECTION_QUERY = /* GraphQL */ `
       }
     }
   }
-  ${COLLECTION_FRAGMENT}
-  ${PRODUCT_FRAGMENT}
+  ${COLLECTION_WITH_PRODUCTS_FRAGMENTS}
 `;
 
 // ─── Cart Mutations ───────────────────────────────────────────────────────────
@@ -315,7 +333,7 @@ export const CREATE_CART_MUTATION = /* GraphQL */ `
       }
     }
   }
-  ${CART_FRAGMENT}
+  ${CART_FRAGMENTS}
 `;
 
 export const ADD_TO_CART_MUTATION = /* GraphQL */ `
@@ -331,7 +349,7 @@ export const ADD_TO_CART_MUTATION = /* GraphQL */ `
       }
     }
   }
-  ${CART_FRAGMENT}
+  ${CART_FRAGMENTS}
 `;
 
 export const REMOVE_FROM_CART_MUTATION = /* GraphQL */ `
@@ -347,7 +365,7 @@ export const REMOVE_FROM_CART_MUTATION = /* GraphQL */ `
       }
     }
   }
-  ${CART_FRAGMENT}
+  ${CART_FRAGMENTS}
 `;
 
 export const UPDATE_CART_LINE_MUTATION = /* GraphQL */ `
@@ -363,7 +381,7 @@ export const UPDATE_CART_LINE_MUTATION = /* GraphQL */ `
       }
     }
   }
-  ${CART_FRAGMENT}
+  ${CART_FRAGMENTS}
 `;
 
 export const GET_CART_QUERY = /* GraphQL */ `
@@ -372,5 +390,6 @@ export const GET_CART_QUERY = /* GraphQL */ `
       ...CartFields
     }
   }
-  ${CART_FRAGMENT}
+  ${CART_FRAGMENTS}
 `;
+
