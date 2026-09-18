@@ -1,67 +1,104 @@
-# ⚡ Forge — Student Habit-Building Web App
+# Lantern — Next.js + Sanity + Shopify
 
-A high-quality, mobile-first student habit-building web application designed for **MESA Forge PGP**.
+Premium Indian home-fragrance brand. Headless commerce stack: **Next.js 15 (App Router) + Sanity v3 + Shopify Storefront API**, deployed on Vercel.
 
-Built with a focus on behavioral psychology, frictionless one-line habit creation, streak momentum, and zero-latency client-side persistence.
+## Tech Stack
 
-🔗 **Live Production Deployment**: [https://mesa-five-jet.vercel.app/habits](https://mesa-five-jet.vercel.app/habits)
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 15 (App Router, TypeScript) |
+| CMS | Sanity v3 (embedded Studio at `/studio`) |
+| Commerce | Shopify Storefront API (Cart + Checkout) |
+| Hosting | Vercel |
 
----
+## Getting Started
 
-## 🌟 Key Features
+### 1. Install dependencies
+```bash
+npm install
+```
 
-### 1. 🎯 Frictionless Natural Language Input
-- Preserves the core one-line habit capture philosophy.
-- Live NLP parsing: type *"Go to gym 4 times a week"* or *"Read for 20 minutes before bed"*, and Forge automatically infers:
-  - Clean title
-  - Target frequency (Daily, Weekdays, Weekends, or *N* times per week)
-  - Preferred time of day (Morning, Afternoon, Evening)
-  - Category (Fitness, Study, Mindfulness, Health, Social)
-  - Curated emoji & theme color
+### 2. Set up environment variables
+Copy `.env.local.example` to `.env.local` and fill in your values:
+```bash
+cp .env.local.example .env.local
+```
 
-### 2. 📊 High-Performance Daily Execution
-- **Animated SVG Progress Ring**: Visual completion feedback that calculates daily percentages in real-time.
-- **Micro-interactions**: Satisfying SVG checkmark draw animation, radiating ripple effect, and mobile haptic feedback (`navigator.vibrate`).
-- **7-Day History Mini-Dots**: Instant visibility into the last 7 days of consistency directly on every habit card.
-- **Recovery Messaging**: Constructive behavioral nudges (*"Fresh start 🌱"*) instead of guilt-inducing broken streak alerts.
-- **Celebrations & Confetti**: Full canvas particle confetti burst on 100% daily completion.
+### 3. Shopify — Get Storefront API token
+1. Go to [Shopify Admin](https://admin.shopify.com/store/lantern-candles) → Settings → Apps → Develop Apps
+2. Create app → Configure Storefront API scopes:
+   - `unauthenticated_read_product_listings`
+   - `unauthenticated_read_product_inventory`
+   - `unauthenticated_read_checkouts`
+   - `unauthenticated_write_checkouts`
+3. Install app → copy **Storefront API access token**
+4. Paste into `.env.local` as `NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN`
 
-### 3. 📈 Comprehensive Analytics & Insights
-- **Key Metrics**: Real-time current streak, 30-day consistency percentage, and total lifetime check-ins.
-- **Weekly Discipline Grid**: Monday-to-Sunday overview showing daily completion ratios.
-- **15-Week Contribution Heatmap**: GitHub-style activity heatmaps for each individual habit.
+> **Note:** The site runs on mock data until Shopify credentials are added. No errors will occur.
 
-### 4. 🎨 Design System & Accessibility
-- **Dark & Light Modes**: System-aware theme toggle with instant CSS variable transitions.
-- **Mobile-First UX**: Dedicated bottom tab bar with an elevated center Floating Action Button (FAB) on mobile (< 768px), transitioning to an ergonomic sticky sidebar on desktop (≥ 768px).
-- **Keyboard Shortcuts**: Press `N` to open the habit creation sheet; press `Escape` to close any open modal.
-- **Zero Latency**: Privacy-first local persistence via `localStorage` — no mandatory login or external API dependencies required.
+### 4. Sanity — Create a project
+```bash
+npx sanity@latest init
+```
+Follow the prompts — log in, create a new project called "Lantern", use dataset `production`.
+Copy the Project ID and paste into `.env.local`.
 
----
+### 5. Run locally
+```bash
+npm run dev
+```
 
-## 🚀 Tech Stack
+Open [http://localhost:3000](http://localhost:3000)
 
-- **HTML5**: Semantic, accessible markup with full ARIA specifications.
-- **CSS3**: Modern design tokens, spring easing transitions, CSS variables, and fluid typography.
-- **Vanilla JavaScript**: Lightweight, modular event delegation and SVG animation engine.
-- **Deployment**: Vercel with clean URL routing.
+Sanity Studio runs at [http://localhost:3000/studio](http://localhost:3000/studio)
 
----
+## Project Structure
 
-## 💻 Local Development
+```
+app/              → Next.js App Router pages
+components/       → React components (layout, cart, product, ui)
+lib/
+  shopify/        → Storefront API client, queries, types, mock data
+  sanity/         → Sanity client, GROQ queries, types
+sanity/
+  schemaTypes/    → Sanity content schemas
+public/
+  images/         → Product images
+sanity.config.ts  → Sanity Studio configuration
+```
 
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/paramdeora/mesa-forge-habits.git
-   cd mesa-forge-habits
-   ```
+## Vercel Deployment
 
-2. Serve using any static file server:
-   ```bash
-   npx serve -l 8080 .
-   ```
+Add these environment variables in Vercel dashboard:
 
-3. Open in your browser:
-   ```
-   http://localhost:8080/habits.html
-   ```
+```
+NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN
+NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN
+NEXT_PUBLIC_SANITY_PROJECT_ID
+NEXT_PUBLIC_SANITY_DATASET
+SANITY_API_TOKEN
+NEXT_PUBLIC_SITE_URL
+```
+
+## Product Images
+
+Current images are in `public/images/`. When Shopify products are live, images will be served from Shopify CDN automatically.
+
+## Adding Products to Shopify
+
+When you create products in Shopify Admin, use these handles:
+- `dusk-vetiver`
+- `grey-cardamom`
+- `white-jasmine`
+- `amber-rain`
+
+And create collections with these handles:
+- `morning-calm`
+- `evening-ritual`
+- `monsoon-noir`
+- `deep-focus`
+- `all` (for showing all products)
+
+## Checkout
+
+Cart is managed in Next.js via React Context. "Proceed to Checkout" redirects users to Shopify's native checkout page, which handles payment, taxes, and shipping.
