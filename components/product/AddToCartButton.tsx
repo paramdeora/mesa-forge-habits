@@ -8,19 +8,20 @@ interface AddToCartButtonProps {
   productTitle: string;
   available?: boolean;
   className?: string;
+  quantity?: number;
 }
 
-export default function AddToCartButton({ variantId, productTitle, available = true, className }: AddToCartButtonProps) {
+export default function AddToCartButton({ variantId, productTitle, available = true, className, quantity = 1 }: AddToCartButtonProps) {
   const { addItem } = useCart();
   const [status, setStatus] = useState<'idle' | 'adding' | 'added'>('idle');
 
   const handleClick = useCallback(async () => {
     if (status !== 'idle' || !available) return;
     setStatus('adding');
-    await addItem(variantId, 1);
+    await addItem(variantId, quantity);
     setStatus('added');
     setTimeout(() => setStatus('idle'), 1800);
-  }, [addItem, variantId, status, available]);
+  }, [addItem, variantId, quantity, status, available]);
 
   if (!available) {
     return (

@@ -286,6 +286,7 @@ export default function ProductForm({ product }: ProductFormProps) {
                 variantId={selectedVariant?.id ?? ''}
                 productTitle={product.title}
                 available={selectedVariant?.availableForSale ?? product.availableForSale}
+                quantity={quantity}
                 className="btn--full"
               />
             </div>
