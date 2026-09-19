@@ -39,10 +39,10 @@ import {
 // ─── Config ───────────────────────────────────────────────────────────────────
 
 const SHOPIFY_STORE_DOMAIN =
-  process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN ?? 'lantern-candles.myshopify.com';
+  process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN ?? 'lantern-candle.myshopify.com';
 
 const STOREFRONT_ACCESS_TOKEN =
-  process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN ?? '';
+  process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN ?? '4edb78875e86c40c5b431ddfe0509252';
 
 const SHOPIFY_API_VERSION = process.env.SHOPIFY_API_VERSION ?? '2024-04';
 

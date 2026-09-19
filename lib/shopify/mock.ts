@@ -135,7 +135,11 @@ export function getMockProducts(): Product[] {
 }
 
 export function getMockProduct(handle: string): Product | null {
-  return MOCK_PRODUCTS.find((p) => p.handle === handle) ?? null;
+  const h = handle.toLowerCase();
+  if (h === 'oceanic-warmth') return MOCK_PRODUCTS.find((p) => p.handle === 'sushupthi') ?? null;
+  if (h === 'rose') return MOCK_PRODUCTS.find((p) => p.handle === 'rosaria') ?? null;
+  if (h === 'spiced-tobacco') return MOCK_PRODUCTS.find((p) => p.handle === 'laniakea') ?? null;
+  return MOCK_PRODUCTS.find((p) => p.handle === h) ?? null;
 }
 
 export function getMockCollections(): Collection[] {
@@ -154,7 +158,7 @@ export function getMockCollection(handle: string): Collection | null {
 export function getMockCart(): Cart {
   return {
     id: 'gid://shopify/Cart/mock-session-cart',
-    checkoutUrl: 'https://lantern-candles.myshopify.com/cart',
+    checkoutUrl: 'https://lantern-candle.myshopify.com/cart',
     cost: {
       subtotalAmount: inrMoney(0),
       totalAmount: inrMoney(0),

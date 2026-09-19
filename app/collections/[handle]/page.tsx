@@ -19,8 +19,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 const COLLECTION_TABS = [
-  { label: 'All Pieces', handle: 'all', count: 14 },
-  { label: 'Rituals', handle: 'rituals', count: 6 },
+  { label: 'All Pieces', handle: 'all', count: 15 },
+  { label: 'Rituals', handle: 'rituals', count: 7 },
   { label: 'Aesthetic', handle: 'aesthetic', count: 3 },
   { label: 'Gifting', handle: 'gifting', count: 5 },
 ];
